@@ -30,31 +30,7 @@ export const Footer = ({ className }: { className?: string }) => {
         </div>
       }
     >
-      <LandingFooterColumn title="Product">
-        <LandingFooterLink href="/features">{'Features'}</LandingFooterLink>
-        <LandingFooterLink href="/pricing">{'Pricing'}</LandingFooterLink>
-        <LandingFooterLink href="/security">{'Security'}</LandingFooterLink>
-        <LandingFooterLink href="/faq">{'FAQ'}</LandingFooterLink>
-      </LandingFooterColumn>
-      <LandingFooterColumn title="Company">
-        <LandingFooterLink href="/about">{'About Us'}</LandingFooterLink>
-        <LandingFooterLink href="/careers">{'Careers'}</LandingFooterLink>
-        <LandingFooterLink href="/press">{'Press'}</LandingFooterLink>
-      </LandingFooterColumn>
-      <LandingFooterColumn title="Support">
-        <LandingFooterLink href="/help">{'Help Center'}</LandingFooterLink>
-        <LandingFooterLink href="/contact">{'Contact Us'}</LandingFooterLink>
-        <LandingFooterLink href="/status">{'System Status'}</LandingFooterLink>
-      </LandingFooterColumn>
-      <LandingFooterColumn title="Legal">
-        <LandingFooterLink href="/terms">
-          {'Terms of Service'}
-        </LandingFooterLink>
-        <LandingFooterLink href="/privacy">
-          {'Privacy Policy'}
-        </LandingFooterLink>
-        <LandingFooterLink href="/cookies">{'Cookie Policy'}</LandingFooterLink>
-      </LandingFooterColumn>
+      {/* Footer links removed - pages deleted for starter template */}
     </LandingFooter>
   );
 };
