@@ -48,8 +48,21 @@ const NavGroup = ({
   );
 };
 
-export const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+export const Sidebar = ({
+  collapsed: collapsedProp,
+  onCollapsedChange,
+}: {
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+}) => {
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const collapsed = collapsedProp ?? internalCollapsed;
+  const setCollapsed = (next: boolean) => {
+    onCollapsedChange?.(next);
+    if (collapsedProp === undefined) {
+      setInternalCollapsed(next);
+    }
+  };
   const allNavItems = useMemo(
     () => [...dashboardPrimaryNav, ...dashboardChannelsNav, ...dashboardUtilityNav],
     [],
@@ -70,7 +83,7 @@ export const Sidebar = () => {
             </div>
             {!collapsed && (
               <div className="min-w-0">
-                <div className="text-white font-semibold truncate">Pingo Agency</div>
+                <div className="text-white font-semibold truncate">Confess Box</div>
                 <div className="text-gray-400 text-sm truncate">Dashboard</div>
               </div>
             )}

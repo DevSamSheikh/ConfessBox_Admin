@@ -312,11 +312,11 @@ export const dashboardComments: DashboardComment[] = [
 ];
 
 export const dashboardProfile: DashboardProfile = {
-  displayName: 'Merlin',
-  handle: '@GinnyJ',
-  initials: 'M',
+  displayName: 'Hassam',
+  handle: '@Hassam',
+  initials: 'H',
   stats: [
-    { label: 'Follower', value: '4.8K' },
+    { label: 'Follower', value: '9.9T' },
     { label: 'Post', value: '125' },
     { label: 'Tags', value: '168' },
   ],
