@@ -20,7 +20,7 @@ export const CommentsList = ({ comments }: { comments: DashboardComment[] }) => 
         {comments.map((c) => (
           <div
             key={c.id}
-            className="rounded-2xl border border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-grad-to)] p-4 transition hover:border-[var(--db-border-soft)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+            className="rounded-2xl border border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-grad-to)] p-4 shadow-[var(--db-shadow-card)] transition hover:border-[var(--db-border-soft)] hover:shadow-[var(--db-shadow-card-hover)]"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">

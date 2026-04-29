@@ -145,7 +145,7 @@ export const TopPostsCard = ({ items }: { items: DashboardTopPost[] }) => {
                 <div
                   key={post.id}
                   className={cn(
-                    'relative aspect-square rounded-2xl border border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-bg)] p-4 shadow-[0_14px_30px_rgba(0,0,0,0.35)]',
+                    'relative aspect-square rounded-2xl border border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-bg)] p-4 shadow-[var(--db-shadow-card)]',
                   )}
                 >
                   <div className="pointer-events-none absolute left-0 top-0 z-20 -translate-x-1/3 -translate-y-1/2 rounded-md border border-[var(--db-border-subtle)] bg-gradient-to-br from-[var(--db-secondary)] to-[var(--db-primary)] p-1 text-xs font-semibold text-[var(--db-text-primary)] shadow-lg shadow-purple-900/30">

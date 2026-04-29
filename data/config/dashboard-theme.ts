@@ -48,6 +48,10 @@ export const dashboardThemeDark = {
   donutMale: '#2F6BFF',
   donutFemale: '#7A3BFF',
   donutOther: 'rgba(156,163,175,0.6)',
+
+  // Elevation (use with shadow-[var(--db-shadow-card)])
+  shadowCard: '0 14px 30px rgba(0, 0, 0, 0.35)',
+  shadowCardHover: '0 10px 30px rgba(0, 0, 0, 0.35)',
 } as const;
 
 /**
@@ -55,47 +59,57 @@ export const dashboardThemeDark = {
  * Uses same token names so components switch automatically.
  */
 export const dashboardThemeLight = {
-  // Base surfaces
-  bgStart: '#F6F8FF',
-  bgEnd: '#EEF2FF',
-  sidebarBg: '#FFFFFF',
+  /**
+   * Light dashboard: cool-neutral page, crisp cards, airy borders.
+   * Slightly tinted whites so UI does not feel flat against pure white.
+   */
+  // Base surfaces — soft blue-gray gradient, not harsh white-grey
+  bgStart: '#F4F6FA',
+  bgEnd: '#E8EDF8',
+  sidebarBg: '#FAFBFD',
   cardBg: '#FFFFFF',
-  cardElevatedBg: '#F8FAFF',
+  cardElevatedBg: '#F7F9FC',
   cardGradientFrom: '#FFFFFF',
-  cardGradientTo: '#F3F6FF',
+  cardGradientTo: '#F4F7FB',
 
-  // Text
-  textPrimary: '#0F172A',
-  textSecondary: '#475569',
-  textMuted: '#64748B',
+  // Text — higher contrast hierarchy; body stays readable on tinted bg
+  textPrimary: '#101828',
+  textSecondary: '#5C667A',
+  textMuted: '#7A8499',
 
-  // Borders and overlays
-  borderSubtle: 'rgba(15,23,42,0.10)',
-  borderSoft: 'rgba(15,23,42,0.18)',
-  overlaySoft: 'rgba(15,23,42,0.05)',
-  overlayStrong: 'rgba(15,23,42,0.10)',
-  gridLine: 'rgba(15,23,42,0.08)',
-  tooltipCursor: 'rgba(15,23,42,0.20)',
+  // Borders — lighter touch; separators stay visible without heaviness
+  borderSubtle: 'rgba(16, 24, 40, 0.08)',
+  borderSoft: 'rgba(16, 24, 40, 0.14)',
+  overlaySoft: 'rgba(47, 107, 255, 0.06)',
+  overlayStrong: 'rgba(47, 107, 255, 0.10)',
+  gridLine: 'rgba(16, 24, 40, 0.07)',
+  tooltipCursor: 'rgba(16, 24, 40, 0.12)',
 
-  // Brand / accents
-  primary: '#2F6BFF',
-  primaryHover: '#1D42B8',
-  secondary: '#7A3BFF',
-  accentCyan: '#0891B2',
+  // Brand — slightly richer on light backgrounds
+  primary: '#2563EB',
+  primaryHover: '#1D4ED8',
+  secondary: '#6D36E6',
+  accentCyan: '#0E7490',
   accentEmerald: '#059669',
   accentOrange: '#EA580C',
   accentRed: '#DC2626',
 
-  // Line chart metric colors
-  lineFollowers: '#2F6BFF',
-  lineFollowing: '#7A3BFF',
-  lineLikes: '#0891B2',
+  // Line chart — saturated enough to read on light grid
+  lineFollowers: '#2563EB',
+  lineFollowing: '#7C3AED',
+  lineLikes: '#0D9488',
   lineComments: '#EA580C',
 
-  // Donut chart segment colors
-  donutMale: '#2F6BFF',
-  donutFemale: '#7A3BFF',
-  donutOther: 'rgba(100,116,139,0.65)',
+  // Donut — align with brand; other segment neutral slate
+  donutMale: '#2563EB',
+  donutFemale: '#7C3AED',
+  donutOther: 'rgba(100, 116, 139, 0.55)',
+
+  // Elevation — soft layered shadow (material-style, not harsh black)
+  shadowCard:
+    '0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.07), 0 12px 32px rgba(47, 107, 255, 0.06)',
+  shadowCardHover:
+    '0 4px 8px rgba(16, 24, 40, 0.06), 0 12px 28px rgba(16, 24, 40, 0.1), 0 16px 40px rgba(47, 107, 255, 0.08)',
 } as const;
 
 /**
@@ -135,6 +149,8 @@ export const getDashboardThemeVars = (theme: DashboardTheme) =>
     '--db-donut-male': theme.donutMale,
     '--db-donut-female': theme.donutFemale,
     '--db-donut-other': theme.donutOther,
+    '--db-shadow-card': theme.shadowCard,
+    '--db-shadow-card-hover': theme.shadowCardHover,
   }) as const;
 
 export const dashboardThemeVarsDark = getDashboardThemeVars(dashboardThemeDark);
