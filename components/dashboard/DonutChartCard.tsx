@@ -2,7 +2,6 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, type TooltipProps } from 'recharts';
 import { Card } from '@/components/shared/ui/card';
-import { dashboardTheme } from '@/data/config/dashboard-theme';
 import type { DashboardAudienceSegment } from '@/app/dashboard/dashboard-data';
 
 const formatCompact = (value: number) =>
@@ -28,10 +27,10 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
     value: s.value,
     fill:
       s.key === 'male'
-        ? dashboardTheme.donutMale
+        ? 'var(--db-donut-male)'
         : s.key === 'female'
-          ? dashboardTheme.donutFemale
-          : dashboardTheme.donutOther,
+          ? 'var(--db-donut-female)'
+          : 'var(--db-donut-other)',
   }));
   const withPercent = data.map((item) => ({
     ...item,
@@ -64,7 +63,7 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
                   <text
                     x={x}
                     y={y}
-                    fill={dashboardTheme.textSecondary}
+                    fill="var(--db-text-secondary)"
                     textAnchor={x > Number(cx) ? 'start' : 'end'}
                     dominantBaseline="central"
                     fontSize={10}
@@ -97,10 +96,10 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
               style={{
                 background:
                   s.key === 'male'
-                    ? dashboardTheme.donutMale
+                    ? 'var(--db-donut-male)'
                     : s.key === 'female'
-                      ? dashboardTheme.donutFemale
-                      : dashboardTheme.donutOther,
+                      ? 'var(--db-donut-female)'
+                      : 'var(--db-donut-other)',
               }}
             />
             <span>{s.label}</span>

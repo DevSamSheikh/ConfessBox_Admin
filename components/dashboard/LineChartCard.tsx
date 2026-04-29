@@ -25,7 +25,6 @@ import {
   SelectValue,
 } from '@/components/shared/ui/select';
 import { cn } from '@/lib/utils';
-import { dashboardTheme } from '@/data/config/dashboard-theme';
 import type {
   DashboardTrendMetric,
   DashboardTrendPoint,
@@ -75,10 +74,10 @@ export const LineChartCard = ({ data }: { data: DashboardTrendPoint[] }) => {
   const [range, setRange] = useState<RangeValue>('months');
 
   const accent = useMemo(() => {
-    if (metric === 'followers') return dashboardTheme.lineFollowers;
-    if (metric === 'following') return dashboardTheme.lineFollowing;
-    if (metric === 'likes') return dashboardTheme.lineLikes;
-    return dashboardTheme.lineComments;
+    if (metric === 'followers') return 'var(--db-line-followers)';
+    if (metric === 'following') return 'var(--db-line-following)';
+    if (metric === 'likes') return 'var(--db-line-likes)';
+    return 'var(--db-line-comments)';
   }, [metric]);
 
   return (
@@ -132,13 +131,13 @@ export const LineChartCard = ({ data }: { data: DashboardTrendPoint[] }) => {
               dataKey="month"
               tickLine={false}
               axisLine={false}
-              tick={{ fill: dashboardTheme.textSecondary, fontSize: 12 }}
+              tick={{ fill: 'var(--db-text-secondary)', fontSize: 12 }}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               tickFormatter={formatAxisCompact}
-              tick={{ fill: dashboardTheme.textSecondary, fontSize: 12 }}
+              tick={{ fill: 'var(--db-text-secondary)', fontSize: 12 }}
             />
             <Tooltip
               content={<TrendTooltip />}

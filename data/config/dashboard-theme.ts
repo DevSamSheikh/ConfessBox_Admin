@@ -6,7 +6,7 @@
  * Update any value here to change dashboard theme globally.
  * Components should consume these via CSS variables only.
  */
-export const dashboardTheme = {
+export const dashboardThemeDark = {
   // Base surfaces
   bgStart: '#0B0B15',
   bgEnd: '#1A1333',
@@ -51,37 +51,91 @@ export const dashboardTheme = {
 } as const;
 
 /**
- * CSS variable map for inline style usage on dashboard root.
+ * Dashboard light palette.
+ * Uses same token names so components switch automatically.
  */
-export const dashboardThemeVars = {
-  '--db-bg-start': dashboardTheme.bgStart,
-  '--db-bg-end': dashboardTheme.bgEnd,
-  '--db-sidebar-bg': dashboardTheme.sidebarBg,
-  '--db-card-bg': dashboardTheme.cardBg,
-  '--db-card-elevated': dashboardTheme.cardElevatedBg,
-  '--db-card-grad-from': dashboardTheme.cardGradientFrom,
-  '--db-card-grad-to': dashboardTheme.cardGradientTo,
-  '--db-text-primary': dashboardTheme.textPrimary,
-  '--db-text-secondary': dashboardTheme.textSecondary,
-  '--db-text-muted': dashboardTheme.textMuted,
-  '--db-border-subtle': dashboardTheme.borderSubtle,
-  '--db-border-soft': dashboardTheme.borderSoft,
-  '--db-overlay-soft': dashboardTheme.overlaySoft,
-  '--db-overlay-strong': dashboardTheme.overlayStrong,
-  '--db-grid-line': dashboardTheme.gridLine,
-  '--db-tooltip-cursor': dashboardTheme.tooltipCursor,
-  '--db-primary': dashboardTheme.primary,
-  '--db-primary-hover': dashboardTheme.primaryHover,
-  '--db-secondary': dashboardTheme.secondary,
-  '--db-accent-cyan': dashboardTheme.accentCyan,
-  '--db-accent-emerald': dashboardTheme.accentEmerald,
-  '--db-accent-orange': dashboardTheme.accentOrange,
-  '--db-accent-red': dashboardTheme.accentRed,
-  '--db-line-followers': dashboardTheme.lineFollowers,
-  '--db-line-following': dashboardTheme.lineFollowing,
-  '--db-line-likes': dashboardTheme.lineLikes,
-  '--db-line-comments': dashboardTheme.lineComments,
-  '--db-donut-male': dashboardTheme.donutMale,
-  '--db-donut-female': dashboardTheme.donutFemale,
-  '--db-donut-other': dashboardTheme.donutOther,
+export const dashboardThemeLight = {
+  // Base surfaces
+  bgStart: '#F6F8FF',
+  bgEnd: '#EEF2FF',
+  sidebarBg: '#FFFFFF',
+  cardBg: '#FFFFFF',
+  cardElevatedBg: '#F8FAFF',
+  cardGradientFrom: '#FFFFFF',
+  cardGradientTo: '#F3F6FF',
+
+  // Text
+  textPrimary: '#0F172A',
+  textSecondary: '#475569',
+  textMuted: '#64748B',
+
+  // Borders and overlays
+  borderSubtle: 'rgba(15,23,42,0.10)',
+  borderSoft: 'rgba(15,23,42,0.18)',
+  overlaySoft: 'rgba(15,23,42,0.05)',
+  overlayStrong: 'rgba(15,23,42,0.10)',
+  gridLine: 'rgba(15,23,42,0.08)',
+  tooltipCursor: 'rgba(15,23,42,0.20)',
+
+  // Brand / accents
+  primary: '#2F6BFF',
+  primaryHover: '#1D42B8',
+  secondary: '#7A3BFF',
+  accentCyan: '#0891B2',
+  accentEmerald: '#059669',
+  accentOrange: '#EA580C',
+  accentRed: '#DC2626',
+
+  // Line chart metric colors
+  lineFollowers: '#2F6BFF',
+  lineFollowing: '#7A3BFF',
+  lineLikes: '#0891B2',
+  lineComments: '#EA580C',
+
+  // Donut chart segment colors
+  donutMale: '#2F6BFF',
+  donutFemale: '#7A3BFF',
+  donutOther: 'rgba(100,116,139,0.65)',
 } as const;
+
+/**
+ * Build CSS variable map for inline style usage on dashboard root.
+ */
+type DashboardTheme = Record<string, string>;
+
+export const getDashboardThemeVars = (theme: DashboardTheme) =>
+  ({
+    '--db-bg-start': theme.bgStart,
+    '--db-bg-end': theme.bgEnd,
+    '--db-sidebar-bg': theme.sidebarBg,
+    '--db-card-bg': theme.cardBg,
+    '--db-card-elevated': theme.cardElevatedBg,
+    '--db-card-grad-from': theme.cardGradientFrom,
+    '--db-card-grad-to': theme.cardGradientTo,
+    '--db-text-primary': theme.textPrimary,
+    '--db-text-secondary': theme.textSecondary,
+    '--db-text-muted': theme.textMuted,
+    '--db-border-subtle': theme.borderSubtle,
+    '--db-border-soft': theme.borderSoft,
+    '--db-overlay-soft': theme.overlaySoft,
+    '--db-overlay-strong': theme.overlayStrong,
+    '--db-grid-line': theme.gridLine,
+    '--db-tooltip-cursor': theme.tooltipCursor,
+    '--db-primary': theme.primary,
+    '--db-primary-hover': theme.primaryHover,
+    '--db-secondary': theme.secondary,
+    '--db-accent-cyan': theme.accentCyan,
+    '--db-accent-emerald': theme.accentEmerald,
+    '--db-accent-orange': theme.accentOrange,
+    '--db-accent-red': theme.accentRed,
+    '--db-line-followers': theme.lineFollowers,
+    '--db-line-following': theme.lineFollowing,
+    '--db-line-likes': theme.lineLikes,
+    '--db-line-comments': theme.lineComments,
+    '--db-donut-male': theme.donutMale,
+    '--db-donut-female': theme.donutFemale,
+    '--db-donut-other': theme.donutOther,
+  }) as const;
+
+export const dashboardThemeVarsDark = getDashboardThemeVars(dashboardThemeDark);
+export const dashboardThemeVarsLight = getDashboardThemeVars(dashboardThemeLight);
