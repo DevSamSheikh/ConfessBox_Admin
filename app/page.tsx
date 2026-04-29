@@ -1,3 +1,6 @@
+import { CustomLink } from '@/components/shared/Link';
+import { Button } from '@/components/shared/ui/button';
+
 export default function Page() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -14,6 +17,12 @@ export default function Page() {
           <p>✅ Tailwind CSS styling</p>
           <p>✅ Theme system ready</p>
           <p>✅ Component library available</p>
+        </div>
+
+        <div className="mt-10 flex items-center justify-center">
+          <Button asChild variant="primary" className="rounded-full">
+            <CustomLink href="/dashboard">Open dashboard</CustomLink>
+          </Button>
         </div>
       </div>
     </div>
