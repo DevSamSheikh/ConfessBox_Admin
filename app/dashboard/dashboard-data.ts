@@ -37,10 +37,15 @@ export type DashboardRecentPost = {
 
 export type DashboardTopPost = {
   id: string;
-  title: string;
-  subtitle: string;
-  gradientFrom: string;
-  gradientTo: string;
+  authorName: string;
+  authorHandle: string;
+  postedAtLabel: string;
+  heading: string;
+  content: string;
+  interactions: number;
+  comments: number;
+  shares: number;
+  views: number;
 };
 
 export type DashboardComment = {
@@ -52,6 +57,8 @@ export type DashboardComment = {
   };
   message: string;
   createdAtLabel: string;
+  upvotes: number;
+  downvotes: number;
 };
 
 export type DashboardProfile = {
@@ -131,17 +138,146 @@ export const dashboardRecentPosts: DashboardRecentPost[] = [
 export const dashboardTopPosts: DashboardTopPost[] = [
   {
     id: 'top-1',
-    title: 'Top Posts',
-    subtitle: 'Trending today',
-    gradientFrom: 'from-secondary-500',
-    gradientTo: 'to-primary-500',
+    authorName: 'Confess Box',
+    authorHandle: '@confessbox',
+    postedAtLabel: '2h',
+    heading: 'Anonymous confession #1821',
+    content:
+      'Sometimes the hardest part of healing is admitting what hurt you. Anonymous confession #1821.',
+    interactions: 2946,
+    comments: 432,
+    shares: 287,
+    views: 52140,
   },
   {
     id: 'top-2',
-    title: 'Featured',
-    subtitle: 'Highest reach',
-    gradientFrom: 'from-primary-500',
-    gradientTo: 'to-cyan-500',
+    authorName: 'Night Notes',
+    authorHandle: '@nightnotes',
+    postedAtLabel: '5h',
+    heading: 'I pretended to be okay',
+    content:
+      'I kept pretending I was okay because I did not want to be a burden. Posting this to remind someone they are not alone.',
+    interactions: 1874,
+    comments: 318,
+    shares: 149,
+    views: 38220,
+  },
+  {
+    id: 'top-3',
+    authorName: 'Silent Letters',
+    authorHandle: '@silentletters',
+    postedAtLabel: '8h',
+    heading: 'To my younger self',
+    content:
+      'To my younger self: your soft heart is not weakness. It is the reason you survived.',
+    interactions: 1632,
+    comments: 204,
+    shares: 96,
+    views: 27690,
+  },
+  {
+    id: 'top-4',
+    authorName: 'Hidden Pages',
+    authorHandle: '@hiddenpages',
+    postedAtLabel: '10h',
+    heading: 'I finally said no',
+    content:
+      'I said no today without apologizing for it. It felt strange at first, but then it felt like freedom.',
+    interactions: 1482,
+    comments: 167,
+    shares: 88,
+    views: 24100,
+  },
+  {
+    id: 'top-5',
+    authorName: 'Midnight Voice',
+    authorHandle: '@midnightvoice',
+    postedAtLabel: '12h',
+    heading: 'Healing is not linear',
+    content:
+      'Some days I feel healed, then one memory breaks me again. Maybe progress is still progress.',
+    interactions: 1325,
+    comments: 143,
+    shares: 75,
+    views: 21980,
+  },
+  {
+    id: 'top-6',
+    authorName: 'Quiet Heart',
+    authorHandle: '@quietheart',
+    postedAtLabel: '14h',
+    heading: 'A message I never sent',
+    content:
+      'I wrote your name and deleted it ten times. Some words are heavy even when they stay unsent.',
+    interactions: 1211,
+    comments: 132,
+    shares: 64,
+    views: 20760,
+  },
+  {
+    id: 'top-7',
+    authorName: 'Confess Box',
+    authorHandle: '@confessbox',
+    postedAtLabel: '16h',
+    heading: 'You are allowed to rest',
+    content:
+      'Rest is not laziness. You do not need to earn a pause by burning out first.',
+    interactions: 1180,
+    comments: 119,
+    shares: 60,
+    views: 19840,
+  },
+  {
+    id: 'top-8',
+    authorName: 'Night Notes',
+    authorHandle: '@nightnotes',
+    postedAtLabel: '18h',
+    heading: 'I miss who I was',
+    content:
+      'Before everything happened, I trusted people faster and laughed louder. I am trying to find that version again.',
+    interactions: 1104,
+    comments: 108,
+    shares: 55,
+    views: 18690,
+  },
+  {
+    id: 'top-9',
+    authorName: 'Silent Letters',
+    authorHandle: '@silentletters',
+    postedAtLabel: '20h',
+    heading: 'Not every goodbye is loud',
+    content:
+      'Sometimes people leave in tiny ways before they leave for real. I noticed too late.',
+    interactions: 1022,
+    comments: 97,
+    shares: 52,
+    views: 17340,
+  },
+  {
+    id: 'top-10',
+    authorName: 'Hidden Pages',
+    authorHandle: '@hiddenpages',
+    postedAtLabel: '22h',
+    heading: 'Small wins still count',
+    content:
+      'I drank water, answered one message, and got out of bed. Today that is enough.',
+    interactions: 988,
+    comments: 92,
+    shares: 48,
+    views: 16920,
+  },
+  {
+    id: 'top-11',
+    authorName: 'Midnight Voice',
+    authorHandle: '@midnightvoice',
+    postedAtLabel: '1d',
+    heading: 'For anyone still trying',
+    content:
+      'You are not behind. You are rebuilding. Keep going even if your steps are quiet.',
+    interactions: 951,
+    comments: 89,
+    shares: 46,
+    views: 16110,
   },
 ];
 
@@ -152,6 +288,8 @@ export const dashboardComments: DashboardComment[] = [
     message:
       'The color palette used in this design is visually consistent and calm.',
     createdAtLabel: '2m ago',
+    upvotes: 42,
+    downvotes: 3,
   },
   {
     id: 'c-2',
@@ -159,6 +297,8 @@ export const dashboardComments: DashboardComment[] = [
     message:
       'The layout feels intuitive and makes it easy to scan metrics at a glance.',
     createdAtLabel: '14m ago',
+    upvotes: 31,
+    downvotes: 4,
   },
   {
     id: 'c-3',
@@ -166,6 +306,8 @@ export const dashboardComments: DashboardComment[] = [
     message:
       'The right rail works well as a live feed without competing with the charts.',
     createdAtLabel: '1h ago',
+    upvotes: 27,
+    downvotes: 2,
   },
 ];
 

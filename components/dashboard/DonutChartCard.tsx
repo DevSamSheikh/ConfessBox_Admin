@@ -44,7 +44,7 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
       <div className="relative mt-4 h-[250px] flex-1 sm:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Tooltip content={<AudienceTooltip />} />
+            <Tooltip content={<AudienceTooltip />} wrapperStyle={{ zIndex: 99999 }} />
             <Pie
               data={withPercent}
               dataKey="value"
@@ -80,7 +80,7 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
           </PieChart>
         </ResponsiveContainer>
 
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+        <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center text-center">
           <div className="text-3xl font-semibold text-white tabular-nums">
             {formatCompact(total)}
           </div>

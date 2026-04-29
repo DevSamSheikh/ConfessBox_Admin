@@ -89,7 +89,7 @@ export const LineChartCard = ({ data }: { data: DashboardTrendPoint[] }) => {
         </div>
 
         <Select value={range} onValueChange={(v) => setRange(v as RangeValue)}>
-          <SelectTrigger className="h-9 w-28 rounded-xl bg-[#171526] border-white/10 text-white">
+          <SelectTrigger className="h-9 w-28 rounded-xl bg-[#171526] border border-white/10 text-white">
             <SelectValue placeholder="Months" />
           </SelectTrigger>
           <SelectContent>
@@ -123,7 +123,7 @@ export const LineChartCard = ({ data }: { data: DashboardTrendPoint[] }) => {
 
       <div className="mt-4 h-[260px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ left: 10, right: 10 }}>
+          <LineChart data={data} margin={{ left: -20, right: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
             <XAxis
               dataKey="month"
@@ -137,7 +137,11 @@ export const LineChartCard = ({ data }: { data: DashboardTrendPoint[] }) => {
               tickFormatter={formatAxisCompact}
               tick={{ fill: 'rgba(156,163,175,0.9)', fontSize: 12 }}
             />
-            <Tooltip content={<TrendTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.12)' }} />
+            <Tooltip
+              content={<TrendTooltip />}
+              cursor={{ stroke: 'rgba(255,255,255,0.12)' }}
+              wrapperStyle={{ zIndex: 99999 }}
+            />
             <Line
               type="monotone"
               dataKey={metric}
