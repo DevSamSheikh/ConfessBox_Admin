@@ -16,8 +16,8 @@ export const Header = ({
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div className="min-w-0">
-        <div className="text-white text-lg font-semibold">Dashboard</div>
-        <div className="text-gray-400 text-sm truncate">
+        <div className="text-[var(--db-text-primary)] text-lg font-semibold">Dashboard</div>
+        <div className="text-[var(--db-text-secondary)] text-sm truncate">
           Hello {profileName}, Welcome back!
         </div>
       </div>
@@ -26,9 +26,9 @@ export const Header = ({
         <div className="relative w-full sm:w-72 lg:w-[360px]">
           <Input
             placeholder="Search"
-            className="h-10 rounded-full bg-[#171526] border border-white/10 text-white placeholder:text-gray-500 pr-10"
+            className="h-10 rounded-full bg-[var(--db-card-bg)] border border-[var(--db-border-subtle)] text-[var(--db-text-primary)] placeholder:text-[var(--db-text-muted)] pr-10"
           />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--db-text-secondary)]">
             <Search className="h-4 w-4" />
           </div>
         </div>
@@ -38,7 +38,7 @@ export const Header = ({
           <Button
             variant="ghost"
             size="icon"
-            className="hover:bg-white/10 text-gray-200"
+            className="hover:bg-[var(--db-overlay-soft)] text-[var(--db-text-secondary)]"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -46,11 +46,11 @@ export const Header = ({
 
           <div className="flex items-center gap-2">
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-white/10 text-white">
+              <AvatarFallback className="bg-[var(--db-overlay-strong)] text-[var(--db-text-primary)]">
                 {profileInitials}
               </AvatarFallback>
             </Avatar>
-            <div className="text-white text-sm font-medium">{profileName}</div>
+            <div className="text-[var(--db-text-primary)] text-sm font-medium">{profileName}</div>
           </div>
         </div>
       </div>

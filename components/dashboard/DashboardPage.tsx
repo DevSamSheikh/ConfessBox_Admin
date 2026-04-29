@@ -34,29 +34,30 @@ export const DashboardPage = () => {
             profileInitials={dashboardProfile.initials}
           />
 
- <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4">            <KPICard
-              icon={<Users className="h-5 w-5 text-blue-400" />}
+          <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4">
+            <KPICard
+              icon={<Users className="h-5 w-5 text-[var(--db-primary)]" />}
               label={dashboardKpis[0].label}
               value={formatCompact(dashboardKpis[0].value)}
               change={`+${dashboardKpis[0].deltaPercent.toFixed(1)}%`}
               changeTone="positive"
             />
             <KPICard
-              icon={<UserPlus className="h-5 w-5 text-violet-400" />}
+              icon={<UserPlus className="h-5 w-5 text-[var(--db-secondary)]" />}
               label={dashboardKpis[1].label}
               value={formatCompact(dashboardKpis[1].value)}
               change={`+${dashboardKpis[1].deltaPercent.toFixed(1)}%`}
               changeTone="positive"
             />
             <KPICard
-              icon={<Heart className="h-5 w-5 text-emerald-400" />}
+              icon={<Heart className="h-5 w-5 text-[var(--db-accent-emerald)]" />}
               label={dashboardKpis[2].label}
               value={formatCompact(dashboardKpis[2].value)}
               change={`${dashboardKpis[2].deltaPercent.toFixed(1)}%`}
               changeTone="negative"
             />
             <KPICard
-              icon={<MessageSquare className="h-5 w-5 text-orange-400" />}
+              icon={<MessageSquare className="h-5 w-5 text-[var(--db-accent-orange)]" />}
               label={dashboardKpis[3].label}
               value={formatCompact(dashboardKpis[3].value)}
               change={`+${dashboardKpis[3].deltaPercent.toFixed(1)}%`}

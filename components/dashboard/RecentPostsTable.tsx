@@ -15,25 +15,25 @@ const formatNumber = (value: number) => Intl.NumberFormat('en').format(value);
 
 export const RecentPostsTable = ({ posts }: { posts: DashboardRecentPost[] }) => {
   return (
-    <Card className="rounded-2xl border border-white/10 bg-[#12101F] p-5">
+    <Card className="rounded-2xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] p-5">
       <div className="flex items-center justify-between">
-        <div className="text-white text-lg font-semibold">Recent Posts</div>
-        <div className="text-gray-500 text-xs">26 Sep 2024</div>
+        <div className="text-[var(--db-text-primary)] text-lg font-semibold">Recent Posts</div>
+        <div className="text-[var(--db-text-muted)] text-xs">26 Sep 2024</div>
       </div>
 
       <div className="mt-4">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/10 hover:bg-transparent">
-              <TableHead className="text-gray-500 text-xs">Post Image</TableHead>
-              <TableHead className="text-gray-500 text-xs">Create Date</TableHead>
-              <TableHead className="text-gray-500 text-xs text-right">
+            <TableRow className="border-[var(--db-border-subtle)] hover:bg-transparent">
+              <TableHead className="text-[var(--db-text-muted)] text-xs">Post Image</TableHead>
+              <TableHead className="text-[var(--db-text-muted)] text-xs">Create Date</TableHead>
+              <TableHead className="text-[var(--db-text-muted)] text-xs text-right">
                 Like
               </TableHead>
-              <TableHead className="text-gray-500 text-xs text-right">
+              <TableHead className="text-[var(--db-text-muted)] text-xs text-right">
                 Comment
               </TableHead>
-              <TableHead className="text-gray-500 text-xs text-right">
+              <TableHead className="text-[var(--db-text-muted)] text-xs text-right">
                 Share
               </TableHead>
             </TableRow>
@@ -42,7 +42,7 @@ export const RecentPostsTable = ({ posts }: { posts: DashboardRecentPost[] }) =>
             {posts.map((post) => (
               <TableRow
                 key={post.id}
-                className="border-white/10 hover:bg-white/5"
+                className="border-[var(--db-border-subtle)] hover:bg-[var(--db-overlay-soft)]"
               >
                 <TableCell className="py-3">
                   <div
@@ -50,15 +50,15 @@ export const RecentPostsTable = ({ posts }: { posts: DashboardRecentPost[] }) =>
                   />
                 </TableCell>
                 <TableCell className="py-3">
-                  <div className="text-gray-400 text-sm">{post.createdAtLabel}</div>
+                  <div className="text-[var(--db-text-secondary)] text-sm">{post.createdAtLabel}</div>
                 </TableCell>
-                <TableCell className="py-3 text-right text-gray-300 text-sm">
+                <TableCell className="py-3 text-right text-[var(--db-text-secondary)] text-sm">
                   {formatNumber(post.likes)}
                 </TableCell>
-                <TableCell className="py-3 text-right text-gray-300 text-sm">
+                <TableCell className="py-3 text-right text-[var(--db-text-secondary)] text-sm">
                   {formatNumber(post.comments)}
                 </TableCell>
-                <TableCell className="py-3 text-right text-gray-300 text-sm">
+                <TableCell className="py-3 text-right text-[var(--db-text-secondary)] text-sm">
                   {formatNumber(post.shares)}
                 </TableCell>
               </TableRow>

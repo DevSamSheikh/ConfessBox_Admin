@@ -2,6 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, type TooltipProps } from 'recharts';
 import { Card } from '@/components/shared/ui/card';
+import { dashboardTheme } from '@/data/config/dashboard-theme';
 import type { DashboardAudienceSegment } from '@/app/dashboard/dashboard-data';
 
 const formatCompact = (value: number) =>
@@ -11,9 +12,9 @@ const AudienceTooltip = ({ active, payload }: TooltipProps<number, string>) => {
   if (!active || !payload?.length) return null;
   const first = payload[0];
   return (
-    <div className="rounded-2xl border border-white/10 bg-[#12101F] px-4 py-3">
-      <div className="text-gray-500 text-xs">{String(first.name ?? '')}</div>
-      <div className="text-white font-semibold text-sm">
+    <div className="rounded-2xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] px-4 py-3">
+      <div className="text-[var(--db-text-muted)] text-xs">{String(first.name ?? '')}</div>
+      <div className="text-[var(--db-text-primary)] font-semibold text-sm">
         {formatCompact(Number(first.value))}
       </div>
     </div>
@@ -27,10 +28,10 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
     value: s.value,
     fill:
       s.key === 'male'
-        ? '#2F6BFF'
+        ? dashboardTheme.donutMale
         : s.key === 'female'
-          ? '#7A3BFF'
-          : 'rgba(156,163,175,0.6)',
+          ? dashboardTheme.donutFemale
+          : dashboardTheme.donutOther,
   }));
   const withPercent = data.map((item) => ({
     ...item,
@@ -38,8 +39,8 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
   }));
 
   return (
-    <Card className="flex h-full flex-col rounded-2xl border border-white/10 bg-[#12101F] p-5">
-      <div className="text-white text-lg font-semibold">Audience</div>
+    <Card className="flex h-full flex-col rounded-2xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] p-5">
+      <div className="text-[var(--db-text-primary)] text-lg font-semibold">Audience</div>
 
       <div className="relative mt-4 h-[250px] flex-1 sm:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -63,7 +64,7 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
                   <text
                     x={x}
                     y={y}
-                    fill="#A3A7B3"
+                    fill={dashboardTheme.textSecondary}
                     textAnchor={x > Number(cx) ? 'start' : 'end'}
                     dominantBaseline="central"
                     fontSize={10}
@@ -81,29 +82,29 @@ export const DonutChartCard = ({ segments }: { segments: DashboardAudienceSegmen
         </ResponsiveContainer>
 
         <div className="pointer-events-none absolute inset-0 z-0 flex flex-col items-center justify-center text-center">
-          <div className="text-3xl font-semibold text-white tabular-nums">
+          <div className="text-3xl font-semibold text-[var(--db-text-primary)] tabular-nums">
             {formatCompact(total)}
           </div>
-          <div className="text-xs text-gray-400 sm:text-sm">Total Audience</div>
+          <div className="text-xs text-[var(--db-text-secondary)] sm:text-sm">Total Audience</div>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:text-sm">
         {segments.map((s) => (
-          <div key={s.key} className="flex items-center gap-1.5 text-gray-400">
+          <div key={s.key} className="flex items-center gap-1.5 text-[var(--db-text-secondary)]">
             <span
               className="h-1.5 w-1.5 rounded-full"
               style={{
                 background:
                   s.key === 'male'
-                    ? '#2F6BFF'
+                    ? dashboardTheme.donutMale
                     : s.key === 'female'
-                      ? '#7A3BFF'
-                      : 'rgba(156,163,175,0.6)',
+                      ? dashboardTheme.donutFemale
+                      : dashboardTheme.donutOther,
               }}
             />
             <span>{s.label}</span>
-            <span className="tabular-nums text-gray-500">{formatCompact(s.value)}</span>
+            <span className="tabular-nums text-[var(--db-text-muted)]">{formatCompact(s.value)}</span>
           </div>
         ))}
       </div>

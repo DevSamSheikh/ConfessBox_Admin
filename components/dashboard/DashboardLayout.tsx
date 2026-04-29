@@ -1,6 +1,7 @@
 'use client';
 
 import type React from 'react';
+import { dashboardThemeVars } from '@/data/config/dashboard-theme';
 
 export const DashboardLayout = ({
   sidebar,
@@ -12,7 +13,10 @@ export const DashboardLayout = ({
   rightPanel: React.ReactNode;
 }) => {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-[#0B0B15] to-[#1A1333] flex flex-col xl:flex-row">
+    <div
+      className="min-h-screen w-full flex flex-col bg-gradient-to-br from-[var(--db-bg-start)] to-[var(--db-bg-end)] xl:flex-row"
+      style={dashboardThemeVars as React.CSSProperties}
+    >
       {sidebar}
       <div className="flex-1 min-w-0">{main}</div>
       {rightPanel}

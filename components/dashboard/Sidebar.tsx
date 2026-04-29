@@ -32,9 +32,10 @@ const NavGroup = ({
             href={item.href}
             className={cn(
               'flex items-center gap-3 rounded-xl px-3 py-2 text-sm border-l-2 border-transparent',
-              'text-gray-300 hover:bg-white/5',
+              'text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]',
               collapsed && 'justify-center px-2',
-              isActive && 'bg-blue-500/20 text-blue-400 border-blue-500',
+              isActive &&
+                'border-[var(--db-primary)] bg-[color-mix(in_srgb,var(--db-primary)_20%,transparent)] text-[var(--db-primary)]',
             )}
             aria-label={collapsed ? item.label : undefined}
             title={collapsed ? item.label : undefined}
@@ -71,20 +72,20 @@ export const Sidebar = ({
   return (
     <aside
       className={cn(
-        'hidden h-screen sticky top-0 xl:flex flex-col justify-between border-r border-white/10 bg-[#0E0C1A] py-6 transition-all duration-200',
+        'hidden h-screen sticky top-0 xl:flex flex-col justify-between border-r border-[var(--db-border-subtle)] bg-[var(--db-sidebar-bg)] py-6 transition-all duration-200',
         collapsed ? 'w-[84px] px-3' : 'w-[240px] px-4',
       )}
     >
       <div className="flex flex-col gap-6">
         <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between')}>
           <div className="flex min-w-0 items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center text-white font-semibold">
+            <div className="h-10 w-10 rounded-xl bg-[var(--db-overlay-strong)] flex items-center justify-center text-[var(--db-text-primary)] font-semibold">
               C
             </div>
             {!collapsed && (
               <div className="min-w-0">
-                <div className="text-white font-semibold truncate">Confess Box</div>
-                <div className="text-gray-400 text-sm truncate">Dashboard</div>
+                <div className="text-[var(--db-text-primary)] font-semibold truncate">Confess Box</div>
+                <div className="text-[var(--db-text-secondary)] text-sm truncate">Dashboard</div>
               </div>
             )}
           </div>
@@ -92,7 +93,7 @@ export const Sidebar = ({
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8 text-gray-300 hover:bg-white/10 hover:text-white"
+              className="h-8 w-8 text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)] hover:text-[var(--db-text-primary)]"
               onClick={() => setCollapsed(true)}
               aria-label="Collapse sidebar"
             >
@@ -103,7 +104,7 @@ export const Sidebar = ({
             <Button
               size="icon"
               variant="ghost"
-              className="absolute top-6 right-3 h-8 w-8 text-gray-300 hover:bg-white/10 hover:text-white"
+              className="absolute top-6 right-3 h-8 w-8 text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)] hover:text-[var(--db-text-primary)]"
               onClick={() => setCollapsed(false)}
               aria-label="Expand sidebar"
             >
@@ -117,7 +118,7 @@ export const Sidebar = ({
 
       <Button
         className={cn(
-          'bg-blue-600 hover:bg-blue-700 text-white rounded-full',
+          'rounded-full bg-[var(--db-primary)] text-[var(--db-text-primary)] hover:bg-[var(--db-primary-hover)]',
           collapsed ? 'h-11 w-11 self-center p-0' : 'w-full',
         )}
         aria-label="Add New Account"
