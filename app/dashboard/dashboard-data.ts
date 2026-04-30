@@ -25,14 +25,33 @@ export type DashboardAudienceSegment = {
   value: number;
 };
 
-export type DashboardRecentPost = {
+export type DashboardReportCategory =
+  | 'violation'
+  | 'false_information'
+  | 'other';
+
+export type DashboardReport = {
   id: string;
-  title: string;
-  createdAtLabel: string;
-  likes: number;
-  comments: number;
-  shares: number;
-  thumbnail: { gradientFrom: string; gradientTo: string };
+  /** Display name of the user who was reported */
+  reportedUserName: string;
+  /** Stable user identifier shown in UI */
+  reportedUserId: string;
+  category: DashboardReportCategory;
+  /** Short description of why the content was flagged */
+  cause: string;
+  /** Display name of the reporter */
+  reportedByName: string;
+  /** ISO datetime string */
+  reportedAtIso: string;
+};
+
+export const DASHBOARD_REPORT_CATEGORY_LABELS: Record<
+  DashboardReportCategory,
+  string
+> = {
+  violation: 'Violation',
+  false_information: 'False Info',
+  other: 'Other',
 };
 
 export type DashboardTopPost = {
@@ -96,44 +115,86 @@ export const dashboardAudience: DashboardAudienceSegment[] = [
   { key: 'other', label: 'Other', value: 35000 },
 ];
 
-export const dashboardRecentPosts: DashboardRecentPost[] = [
-  {
-    id: 'post-1',
-    title: 'Quiet Confession',
-    createdAtLabel: '15 Jun 2024',
-    likes: 1578,
-    comments: 132,
-    shares: 3464,
-    thumbnail: { gradientFrom: 'from-primary-500', gradientTo: 'to-secondary-500' },
-  },
-  {
-    id: 'post-2',
-    title: 'Late Night Note',
-    createdAtLabel: '17 May 2024',
-    likes: 1673,
-    comments: 253,
-    shares: 753,
-    thumbnail: { gradientFrom: 'from-secondary-500', gradientTo: 'to-primary-500' },
-  },
-  {
-    id: 'post-3',
-    title: 'Unsent Message',
-    createdAtLabel: '27 Feb 2024',
-    likes: 1245,
-    comments: 136,
-    shares: 6326,
-    thumbnail: { gradientFrom: 'from-cyan-500', gradientTo: 'to-primary-500' },
-  },
-  {
-    id: 'post-4',
-    title: 'Small Truth',
-    createdAtLabel: '14 Sep 2024',
-    likes: 1754,
-    comments: 122,
-    shares: 3539,
-    thumbnail: { gradientFrom: 'from-primary-600', gradientTo: 'to-secondary-500' },
-  },
+const reportFirstNames = [
+  'Alex',
+  'Jordan',
+  'Sam',
+  'Riley',
+  'Casey',
+  'Morgan',
+  'Quinn',
+  'Avery',
+  'Jamie',
+  'Taylor',
+  'Drew',
+  'Reese',
 ];
+
+const reportLastInitials = ['M.', 'K.', 'L.', 'P.', 'S.', 'R.', 'T.', 'W.'];
+
+const reporterNames = [
+  'Cody Fisher',
+  'Esther Howard',
+  'Guy Hawkins',
+  'Jenny Wilson',
+  'Robert Fox',
+  'Leslie Alexander',
+  'Devon Lane',
+  'Kristin Watson',
+];
+
+const causesByCategory: Record<DashboardReportCategory, string[]> = {
+  violation: [
+    'Targeted harassment in thread replies',
+    'Hate speech and slurs in public post',
+    'Threatening language toward another user',
+    'Bullying a minor in comments',
+    'Sharing private contact info without consent',
+    'Spam attack on community feed',
+  ],
+  false_information: [
+    'Claims about medical cures without sources',
+    'Fabricated screenshot presented as proof',
+    'Misleading statistic about voting results',
+    'False emergency alert repost',
+    'Impersonating official organization',
+    'Outdated news framed as breaking',
+  ],
+  other: [
+    'Off-topic spam in discussion',
+    'Promotional spam with affiliate links',
+    'Duplicate confession posted 6 times',
+    'Bot-like posting pattern',
+    'NSFW thumbnail on SFW topic',
+    'Coordinated brigading suspicion',
+  ],
+};
+
+function rotate<T>(arr: readonly T[], index: number): T {
+  return arr[index % arr.length]!;
+}
+
+/** Sample moderation queue for the dashboard (47 rows — enough to exercise pagination). */
+export const dashboardReports: DashboardReport[] = Array.from(
+  { length: 47 },
+  (_, i) => {
+    const cat: DashboardReportCategory =
+      i % 3 === 0 ? 'violation' : i % 3 === 1 ? 'false_information' : 'other';
+    const day = 28 - (i % 24);
+    const hour = 8 + (i % 12);
+    const minute = (i * 13) % 60;
+    const iso = new Date(2026, 3, day, hour, minute, 0).toISOString();
+    return {
+      id: `report-${i + 1}`,
+      reportedUserName: `${rotate(reportFirstNames, i)} ${rotate(reportLastInitials, i + 2)}`,
+      reportedUserId: `usr_${(10000 + i).toString(36)}`,
+      category: cat,
+      cause: rotate(causesByCategory[cat], i + cat.length),
+      reportedByName: rotate(reporterNames, i + 3),
+      reportedAtIso: iso,
+    };
+  },
+);
 
 export const dashboardTopPosts: DashboardTopPost[] = [
   {

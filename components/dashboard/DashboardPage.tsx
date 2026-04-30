@@ -7,7 +7,7 @@ import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { LineChartCard } from '@/components/dashboard/LineChartCard';
 import { DonutChartCard } from '@/components/dashboard/DonutChartCard';
-import { RecentPostsTable } from '@/components/dashboard/RecentPostsTable';
+import { ReportsTable } from '@/components/dashboard/ReportsTable';
 import { TopPostsCard } from '@/components/dashboard/TopPostsCard';
 import { RightPanel } from '@/components/dashboard/RightPanel';
 import {
@@ -15,7 +15,7 @@ import {
   dashboardComments,
   dashboardKpis,
   dashboardProfile,
-  dashboardRecentPosts,
+  dashboardReports,
   dashboardTopPosts,
   dashboardTrend,
 } from '@/app/dashboard/dashboard-data';
@@ -71,7 +71,7 @@ export const DashboardPage = () => {
           </section>
 
           <section>
-            <RecentPostsTable posts={dashboardRecentPosts} />
+            <ReportsTable reports={dashboardReports} />
           </section>
 
           <section>
