@@ -1,12 +1,16 @@
 'use client';
 
+import * as React from 'react';
 import { Users, UserPlus, Heart, MessageSquare } from 'lucide-react';
+import type { DashboardReport } from '@/app/dashboard/dashboard-data';
+import { buildModerationReportDetail } from '@/app/dashboard/moderation-report-detail';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { LineChartCard } from '@/components/dashboard/LineChartCard';
 import { DonutChartCard } from '@/components/dashboard/DonutChartCard';
+import { ReportModerationDrawer } from '@/components/dashboard/ReportModerationDrawer';
 import { ReportsTable } from '@/components/dashboard/ReportsTable';
 import { TopPostsCard } from '@/components/dashboard/TopPostsCard';
 import { RightPanel } from '@/components/dashboard/RightPanel';
@@ -24,6 +28,14 @@ const formatCompact = (value: number) =>
   Intl.NumberFormat('en', { notation: 'compact' }).format(value);
 
 export const DashboardPage = () => {
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [selectedReport, setSelectedReport] = React.useState<DashboardReport | null>(null);
+
+  const moderationDetail = React.useMemo(
+    () => (selectedReport ? buildModerationReportDetail(selectedReport) : null),
+    [selectedReport],
+  );
+
   return (
     <DashboardLayout
       sidebar={<Sidebar />}
@@ -71,12 +83,29 @@ export const DashboardPage = () => {
           </section>
 
           <section>
-            <ReportsTable reports={dashboardReports} />
+            <ReportsTable
+              reports={dashboardReports}
+              onSelectReport={(row) => {
+                setSelectedReport(row);
+                setDrawerOpen(true);
+              }}
+            />
           </section>
 
           <section>
             <TopPostsCard items={dashboardTopPosts} />
           </section>
+
+          <ReportModerationDrawer
+            open={drawerOpen}
+            onOpenChange={(open) => {
+              setDrawerOpen(open);
+              if (!open) {
+                setSelectedReport(null);
+              }
+            }}
+            detail={moderationDetail}
+          />
         </main>
       }
       rightPanel={<RightPanel profile={dashboardProfile} comments={dashboardComments} />}

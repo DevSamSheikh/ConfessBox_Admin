@@ -7,6 +7,7 @@ import {
   dashboardThemeVarsDark,
   dashboardThemeVarsLight,
 } from '@/data/config/dashboard-theme';
+import { Toaster } from '@/components/shared/ui/sonner';
 
 export const DashboardLayout = ({
   sidebar,
@@ -39,6 +40,7 @@ export const DashboardLayout = ({
       {sidebar}
       <div className="flex-1 min-w-0">{main}</div>
       {rightPanel}
+      <Toaster richColors position="top-center" />
     </div>
   );
 };

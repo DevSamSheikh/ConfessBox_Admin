@@ -87,7 +87,13 @@ function getVisiblePages(
   return out;
 }
 
-export const ReportsTable = ({ reports }: { reports: DashboardReport[] }) => {
+export const ReportsTable = ({
+  reports,
+  onSelectReport,
+}: {
+  reports: DashboardReport[];
+  onSelectReport?: (report: DashboardReport) => void;
+}) => {
   const total = reports.length;
   const [pageSize, setPageSize] = React.useState(5);
   const [page, setPage] = React.useState(1);
@@ -178,7 +184,22 @@ export const ReportsTable = ({ reports }: { reports: DashboardReport[] }) => {
             {pageRows.map((row) => (
               <TableRow
                 key={row.id}
-                className="border-[var(--db-border-subtle)] hover:bg-[var(--db-overlay-soft)]"
+                role={onSelectReport ? 'button' : undefined}
+                tabIndex={onSelectReport ? 0 : undefined}
+                className={cn(
+                  'border-[var(--db-border-subtle)] hover:bg-[var(--db-overlay-soft)]',
+                  onSelectReport && 'cursor-pointer',
+                )}
+                onClick={() => onSelectReport?.(row)}
+                onKeyDown={(e) => {
+                  if (!onSelectReport) {
+                    return;
+                  }
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectReport(row);
+                  }
+                }}
               >
                 <TableCell className="align-top py-3">
                   <div className="font-medium text-[var(--db-text-primary)]">
@@ -212,7 +233,24 @@ export const ReportsTable = ({ reports }: { reports: DashboardReport[] }) => {
         <ul className="space-y-3 sm:hidden">
           {pageRows.map((row) => (
             <li key={row.id}>
-              <Card className="border-[var(--db-border-subtle)] bg-card/95 bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-grad-to)] shadow-sm">
+              <Card
+                role={onSelectReport ? 'button' : undefined}
+                tabIndex={onSelectReport ? 0 : undefined}
+                className={cn(
+                  'border-[var(--db-border-subtle)] bg-card/95 bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-grad-to)] shadow-sm',
+                  onSelectReport && 'cursor-pointer transition hover:border-[var(--db-border-soft)]',
+                )}
+                onClick={() => onSelectReport?.(row)}
+                onKeyDown={(e) => {
+                  if (!onSelectReport) {
+                    return;
+                  }
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectReport(row);
+                  }
+                }}
+              >
                 <CardContent className="p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
