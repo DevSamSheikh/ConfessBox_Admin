@@ -110,7 +110,7 @@ export const TopPostsCard = ({ items }: { items: DashboardTopPost[] }) => {
         </div>
       </div>
 
-      <div className="relative mt-4 overflow-visible px-1 pt-12">
+      <div className="relative mt-4 overflow-visible px-1 pt-6">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={`${currentIndex}-${visibleCount}`}

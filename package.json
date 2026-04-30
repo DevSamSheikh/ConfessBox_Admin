@@ -1,6 +1,6 @@
 {
   "name": "ConfessBox_Admin",
-  "description": "Manage your money the easy way with ConfessBox_Admin. Track expenses, send money, and grow your savings – safely and simply. Sign up free today!",
+  "description": "ConfessBox Admin Dashboard – Efficiently manage, monitor, and moderate your ConfessBox platform. Gain insights, respond to reports, and keep your community safe and engaged.",
   "version": "1.0.0",
   "private": true,
   "scripts": {
