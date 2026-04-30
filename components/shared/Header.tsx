@@ -13,12 +13,12 @@ export const Header = ({ className }: { className?: string }) => {
         <div className="flex items-center text-primary-500 dark:text-primary-500 gap-3">
           <Image
             src="/static/images/logo.png"
-            alt="Mevolut logo"
+            alt="ConfessBox_Admin logo"
             width={200}
             height={200}
             className="h-8 w-8 rounded-full"
           />
-          <span className="font-bold text-lg">Mevolut</span>
+          <span className="font-bold text-lg">ConfessBox_Admin</span>
         </div>
       }
     >

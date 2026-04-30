@@ -10,7 +10,7 @@ export const Footer = ({ className }: { className?: string }) => {
   return (
     <LandingFooter
       className={className}
-      title="Mevolut"
+      title="ConfessBox_Admin"
       description="A simpler way to manage your money"
       withBackground
       withBackgroundGlow={false}
@@ -21,12 +21,12 @@ export const Footer = ({ className }: { className?: string }) => {
         <div className="flex items-center text-primary-900 dark:text-primary-100 gap-3">
           <Image
             src="/static/images/logo.png"
-            alt="Mevolut logo"
+            alt="ConfessBox_Admin logo"
             width={200}
             height={200}
             className="h-8 w-8 rounded-full"
           />
-          {'Mevolut '}
+          {'ConfessBox_Admin '}
         </div>
       }
     >
