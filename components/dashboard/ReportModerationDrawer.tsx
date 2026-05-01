@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils';
 
 type ReportModerationDrawerProps = {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChangeAction: (open: boolean) => void;
   detail: ModerationReportDetail | null;
 };
 
@@ -205,10 +205,11 @@ function ReportedContentSection({ detail }: { detail: ModerationReportDetail }) 
 
 export const ReportModerationDrawer = ({
   open,
-  onOpenChange,
+  onOpenChangeAction,
   detail,
 }: ReportModerationDrawerProps) => {
   const [loadingKey, setLoadingKey] = React.useState<string | null>(null);
+  const isTopPostDrawer = detail?.report.reportId.startsWith('#TP-') ?? false;
 
   const runAction = React.useCallback(async (key: string, message: string) => {
     setLoadingKey(key);
@@ -225,12 +226,14 @@ export const ReportModerationDrawer = ({
   const busy = loadingKey !== null;
 
   return (
-    <Sheet open={open && detail !== null} onOpenChange={onOpenChange}>
+    <Sheet open={open && detail !== null} onOpenChange={onOpenChangeAction}>
       <SheetContent
         side="right"
         hideClose
         className={cn(
           'flex h-full w-full max-w-full flex-col gap-0 overflow-hidden border-l border-border bg-background p-0 shadow-none sm:max-w-[480px]',
+          isTopPostDrawer &&
+            'border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-bg)] text-[var(--db-text-primary)]',
         )}
       >
         {detail && (
@@ -243,7 +246,13 @@ export const ReportModerationDrawer = ({
             </SheetDescription>
 
             {/* Sticky header */}
-            <header className="sticky top-0 z-20 flex shrink-0 flex-col gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur-sm sm:px-5">
+            <header
+              className={cn(
+                'sticky top-0 z-20 flex shrink-0 flex-col gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur-sm sm:px-5',
+                isTopPostDrawer &&
+                  'border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]/95 text-[var(--db-text-primary)]',
+              )}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-2">
                   <p className="truncate font-mono text-sm font-semibold tracking-tight text-foreground">
@@ -267,10 +276,21 @@ export const ReportModerationDrawer = ({
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
               <div className="flex flex-col gap-6">
                 <section>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <h3
+                    className={cn(
+                      'mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground',
+                      isTopPostDrawer && 'text-[var(--db-text-muted)]',
+                    )}
+                  >
                     Report summary
                   </h3>
-                  <Card className="border-border shadow-none">
+                  <Card
+                    className={cn(
+                      'border-border shadow-none',
+                      isTopPostDrawer &&
+                        'border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-bg)]',
+                    )}
+                  >
                     <CardContent className="grid gap-4 p-4">
                       <Field label="Reason">{detail.report.reason}</Field>
                       <Separator />
@@ -288,17 +308,33 @@ export const ReportModerationDrawer = ({
                 </section>
 
                 <section>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <h3
+                    className={cn(
+                      'mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground',
+                      isTopPostDrawer && 'text-[var(--db-text-muted)]',
+                    )}
+                  >
                     Reported content
                   </h3>
                   <ReportedContentSection detail={detail} />
                 </section>
 
                 <section>
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <h3
+                    className={cn(
+                      'mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground',
+                      isTopPostDrawer && 'text-[var(--db-text-muted)]',
+                    )}
+                  >
                     User info
                   </h3>
-                  <Card className="border-border shadow-none">
+                  <Card
+                    className={cn(
+                      'border-border shadow-none',
+                      isTopPostDrawer &&
+                        'border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-bg)]',
+                    )}
+                  >
                     <CardContent className="space-y-4 p-4">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-11 w-11">
@@ -331,14 +367,24 @@ export const ReportModerationDrawer = ({
             </div>
 
             {/* Sticky actions */}
-            <footer className="sticky bottom-0 z-20 shrink-0 border-t border-border bg-background/85 px-4 py-3 backdrop-blur-md sm:px-5">
+            <footer
+              className={cn(
+                'sticky bottom-0 z-20 shrink-0 border-t border-border bg-background/85 px-4 py-3 backdrop-blur-md sm:px-5',
+                isTopPostDrawer &&
+                  'border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]/90',
+              )}
+            >
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                   <Button
                     type="button"
                     variant="destructive"
                     size="sm"
-                    className="w-full sm:w-auto"
+                    className={cn(
+                      'w-full sm:w-auto',
+                      isTopPostDrawer &&
+                        'border-transparent bg-[var(--db-accent-orange)] text-[var(--db-text-primary)] hover:bg-[var(--db-accent-orange)]/90',
+                    )}
                     disabled={busy}
                     onClick={() =>
                       runAction('remove', 'Content removal queued. Report will close when done.')
@@ -350,7 +396,11 @@ export const ReportModerationDrawer = ({
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="w-full border-warning/45 text-warning-foreground hover:bg-warning/10 sm:w-auto"
+                    className={cn(
+                      'w-full border-warning/45 text-warning-foreground hover:bg-warning/10 sm:w-auto',
+                      isTopPostDrawer &&
+                        'border-[var(--db-border-soft)] text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]',
+                    )}
                     disabled={busy}
                     onClick={() => runAction('warn', 'Warning sent to user.')}
                   >
@@ -360,7 +410,11 @@ export const ReportModerationDrawer = ({
                     type="button"
                     variant="success"
                     size="sm"
-                    className="w-full sm:w-auto"
+                    className={cn(
+                      'w-full sm:w-auto',
+                      isTopPostDrawer &&
+                        'border-transparent bg-[var(--db-primary)] text-[var(--db-text-primary)] hover:bg-[var(--db-primary-hover)]',
+                    )}
                     disabled={busy}
                     onClick={() =>
                       runAction('safe', 'Report marked safe and closed without further action.')
@@ -374,7 +428,11 @@ export const ReportModerationDrawer = ({
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="w-full gap-1 sm:ml-auto sm:w-auto"
+                        className={cn(
+                          'w-full gap-1 sm:ml-auto sm:w-auto',
+                          isTopPostDrawer &&
+                            'border-[var(--db-border-soft)] text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)] hover:text-[var(--db-text-primary)]',
+                        )}
                         disabled={busy}
                       >
                         <MoreHorizontal className="h-4 w-4" />

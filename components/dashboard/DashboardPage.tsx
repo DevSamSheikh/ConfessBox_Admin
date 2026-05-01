@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { Users, UserPlus, Heart, MessageSquare } from 'lucide-react';
-import type { DashboardReport } from '@/app/dashboard/dashboard-data';
+import type { DashboardTopPost } from '@/app/dashboard/dashboard-data';
 import { buildModerationReportDetail } from '@/app/dashboard/moderation-report-detail';
+import type { ModerationReportDetail } from '@/app/dashboard/moderation-report-detail';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { Header } from '@/components/dashboard/Header';
@@ -11,6 +12,7 @@ import { KPICard } from '@/components/dashboard/KPICard';
 import { LineChartCard } from '@/components/dashboard/LineChartCard';
 import { DonutChartCard } from '@/components/dashboard/DonutChartCard';
 import { ReportModerationDrawer } from '@/components/dashboard/ReportModerationDrawer';
+import { PostManagementDrawer } from '@/components/dashboard/drawers/PostManagementDrawer';
 import { ReportsTable } from '@/components/dashboard/ReportsTable';
 import { TopPostsCard } from '@/components/dashboard/TopPostsCard';
 import { RightPanel } from '@/components/dashboard/RightPanel';
@@ -28,13 +30,10 @@ const formatCompact = (value: number) =>
   Intl.NumberFormat('en', { notation: 'compact' }).format(value);
 
 export const DashboardPage = () => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [selectedReport, setSelectedReport] = React.useState<DashboardReport | null>(null);
-
-  const moderationDetail = React.useMemo(
-    () => (selectedReport ? buildModerationReportDetail(selectedReport) : null),
-    [selectedReport],
-  );
+  const [reportDrawerOpen, setReportDrawerOpen] = React.useState(false);
+  const [postDrawerOpen, setPostDrawerOpen] = React.useState(false);
+  const [selectedDetail, setSelectedDetail] = React.useState<ModerationReportDetail | null>(null);
+  const [selectedTopPost, setSelectedTopPost] = React.useState<DashboardTopPost | null>(null);
 
   return (
     <DashboardLayout
@@ -86,25 +85,41 @@ export const DashboardPage = () => {
             <ReportsTable
               reports={dashboardReports}
               onSelectReport={(row) => {
-                setSelectedReport(row);
-                setDrawerOpen(true);
+                setSelectedDetail(buildModerationReportDetail(row));
+                setReportDrawerOpen(true);
               }}
             />
           </section>
 
           <section>
-            <TopPostsCard items={dashboardTopPosts} />
+            <TopPostsCard
+              items={dashboardTopPosts}
+              onSelectPostAction={(post) => {
+                setSelectedTopPost(post);
+                setPostDrawerOpen(true);
+              }}
+            />
           </section>
 
           <ReportModerationDrawer
-            open={drawerOpen}
-            onOpenChange={(open) => {
-              setDrawerOpen(open);
+            open={reportDrawerOpen}
+            onOpenChangeAction={(open) => {
+              setReportDrawerOpen(open);
               if (!open) {
-                setSelectedReport(null);
+                setSelectedDetail(null);
               }
             }}
-            detail={moderationDetail}
+            detail={selectedDetail}
+          />
+          <PostManagementDrawer
+            open={postDrawerOpen}
+            onOpenChangeAction={(open) => {
+              setPostDrawerOpen(open);
+              if (!open) {
+                setSelectedTopPost(null);
+              }
+            }}
+            post={selectedTopPost}
           />
         </main>
       }

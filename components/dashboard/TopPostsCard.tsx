@@ -19,7 +19,13 @@ import type { DashboardTopPost } from '@/app/dashboard/dashboard-data';
 const formatNumber = (value: number) =>
   Intl.NumberFormat('en', { notation: 'compact' }).format(value);
 
-export const TopPostsCard = ({ items }: { items: DashboardTopPost[] }) => {
+export const TopPostsCard = ({
+  items,
+  onSelectPostAction,
+}: {
+  items: DashboardTopPost[];
+  onSelectPostAction?: (post: DashboardTopPost) => void;
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(3);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
@@ -144,9 +150,23 @@ export const TopPostsCard = ({ items }: { items: DashboardTopPost[] }) => {
               return (
                 <div
                   key={post.id}
+                  role={onSelectPostAction ? 'button' : undefined}
+                  tabIndex={onSelectPostAction ? 0 : undefined}
                   className={cn(
                     'relative aspect-square rounded-2xl border border-[var(--db-border-subtle)] bg-gradient-to-b from-[var(--db-card-grad-from)] to-[var(--db-card-bg)] p-4 shadow-[var(--db-shadow-card)]',
+                    onSelectPostAction &&
+                      'cursor-pointer transition hover:border-[var(--db-border-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
                   )}
+                  onClick={() => onSelectPostAction?.(post)}
+                  onKeyDown={(event) => {
+                    if (!onSelectPostAction) {
+                      return;
+                    }
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onSelectPostAction(post);
+                    }
+                  }}
                 >
                   <div className="pointer-events-none absolute left-0 top-0 z-20 -translate-x-1/3 -translate-y-1/2 rounded-md border border-[var(--db-border-subtle)] bg-gradient-to-br from-[var(--db-secondary)] to-[var(--db-primary)] p-1 text-xs font-semibold text-[var(--db-text-primary)] shadow-lg shadow-purple-900/30">
                     <div className="flex items-center gap-1">

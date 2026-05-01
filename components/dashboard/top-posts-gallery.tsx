@@ -10,8 +10,7 @@ export const TopPostsGallery = ({ items }: { items: DashboardTopPost[] }) => {
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold text-slate-950 dark:text-slate-50">
-          Top Posts
+        <div className="text-sm font-semibold text-slate-950 dark:text-slate-50">          Top Posts
         </div>
         <Button variant="ghost" className="rounded-full">
           See All <ArrowRight className="ml-2 h-4 w-4" />
@@ -33,19 +32,19 @@ export const TopPostsGallery = ({ items }: { items: DashboardTopPost[] }) => {
             className={cn(
               'absolute inset-0 opacity-90',
               'bg-gradient-to-br',
-              item.gradientFrom,
-              item.gradientTo,
+              'from-blue-500/80 to-violet-500/80',
             )}
             aria-hidden="true"
           />
           <div
-            className="absolute inset-0 bg-gradient-to-t from-slate-950/30 to-transparent dark:from-slate-950/50"
-            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-t from-slate-950/30 to-transparent dark:from-slate-950/50"            aria-hidden="true"
           />
 
           <div className="relative">
-            <div className="text-sm font-semibold text-white">{item.title}</div>
-            <div className="text-sm text-white/80">{item.subtitle}</div>
+            <div className="text-sm font-semibold text-white">{item.heading}</div>
+            <div className="text-sm text-white/80">
+              {item.authorName} · {item.postedAtLabel}
+            </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
