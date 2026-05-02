@@ -11,11 +11,13 @@ import {
   Send,
   Settings,
   Sparkles,
+  UserCog,
 } from 'lucide-react';
 
 export type DashboardNavItem = {
   key:
     | 'dashboard'
+    | 'user-management'
     | 'analytics'
     | 'schedules'
     | 'inbox'
@@ -33,6 +35,12 @@ export type DashboardNavItem = {
 
 export const dashboardPrimaryNav: DashboardNavItem[] = [
   { key: 'dashboard', label: 'Dashboard', icon: Gauge, href: '/dashboard' },
+  {
+    key: 'user-management',
+    label: 'User Management',
+    icon: UserCog,
+    href: '/dashboard/user-management',
+  },
   { key: 'analytics', label: 'Analytics', icon: BarChart3, href: '/dashboard' },
   {
     key: 'schedules',

@@ -1,5 +1,13 @@
 import { genPageMetadata } from '@/app/seo';
-import { DashboardPage } from '@/components/dashboard/DashboardPage';
+import dynamic from 'next/dynamic';
+import { DashboardRouteLoader } from '@/components/dashboard/DashboardRouteLoader';
+
+const DashboardPage = dynamic(
+  () => import('@/components/dashboard/dashboard').then((module) => module.DashboardPage),
+  {
+    loading: () => <DashboardRouteLoader label="Loading dashboard..." />,
+  },
+);
 
 export const metadata = genPageMetadata({
   title: 'Dashboard',

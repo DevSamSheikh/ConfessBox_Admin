@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { CustomLink } from '@/components/shared/Link';
 import { Button } from '@/components/shared/ui/button';
 import { cn } from '@/lib/utils';
@@ -31,11 +32,11 @@ const NavGroup = ({
             key={item.key}
             href={item.href}
             className={cn(
-              'flex items-center gap-3 rounded-xl px-3 py-2 text-sm border-l-2 border-transparent',
-              'text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]',
+              'flex items-center rounded-md gap-3  px-3 py-2 text-sm ',
+              'text-[var(--db-textPrimary)] hover:bg-[var(--db-primary)]',
               collapsed && 'justify-center px-2',
               isActive &&
-                'border-[var(--db-primary)] bg-[color-mix(in_srgb,var(--db-primary)_20%,transparent)] text-[var(--db-primary)]',
+                'border-[var(--db-primary)] bg-[color-mix(in_srgb,var(--db-primary)_20%,transparent)] hover:text-[var(--db-textPrimary)] text-[var(--db-primary)]',
             )}
             aria-label={collapsed ? item.label : undefined}
             title={collapsed ? item.label : undefined}
@@ -56,6 +57,7 @@ export const Sidebar = ({
   collapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
 }) => {
+  const pathname = usePathname();
   const [internalCollapsed, setInternalCollapsed] = useState(false);
   const collapsed = collapsedProp ?? internalCollapsed;
   const setCollapsed = (next: boolean) => {
@@ -65,9 +67,20 @@ export const Sidebar = ({
     }
   };
   const allNavItems = useMemo(
-    () => [...dashboardPrimaryNav, ...dashboardChannelsNav, ...dashboardUtilityNav],
+    () => [
+      ...dashboardPrimaryNav,
+      ...dashboardChannelsNav,
+      ...dashboardUtilityNav,
+    ],
     [],
   );
+  const activeKey = useMemo<DashboardNavItem['key']>(() => {
+    if (pathname.startsWith('/dashboard/user-management')) {
+      return 'user-management';
+    }
+
+    return 'dashboard';
+  }, [pathname]);
 
   return (
     <aside
@@ -77,15 +90,24 @@ export const Sidebar = ({
       )}
     >
       <div className="flex flex-col gap-6">
-        <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between')}>
+        <div
+          className={cn(
+            'flex items-center',
+            collapsed ? 'justify-center' : 'justify-between',
+          )}
+        >
           <div className="flex min-w-0 items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-[var(--db-overlay-strong)] flex items-center justify-center text-[var(--db-text-primary)] font-semibold">
               C
             </div>
             {!collapsed && (
               <div className="min-w-0">
-                <div className="text-[var(--db-text-primary)] font-semibold truncate">Confess Box</div>
-                <div className="text-[var(--db-text-secondary)] text-sm truncate">Dashboard</div>
+                <div className="text-[var(--db-text-primary)] font-semibold truncate">
+                  Confess Box
+                </div>
+                <div className="text-[var(--db-text-secondary)] text-sm truncate">
+                  Dashboard
+                </div>
               </div>
             )}
           </div>
@@ -113,7 +135,11 @@ export const Sidebar = ({
           )}
         </div>
 
-        <NavGroup items={allNavItems} activeKey="dashboard" collapsed={collapsed} />
+        <NavGroup
+          items={allNavItems}
+          activeKey={activeKey}
+          collapsed={collapsed}
+        />
       </div>
 
       <Button
@@ -129,4 +155,3 @@ export const Sidebar = ({
     </aside>
   );
 };
-
