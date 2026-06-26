@@ -1,253 +1,1152 @@
-import { AlertTriangle, Clock3, Laptop, MapPin, Phone, Shield, ShieldAlert, ShieldCheck, Smartphone, Trash2, UserCog, UserRound } from 'lucide-react';
-import { ROLE_CLASS, STATUS_CLASS } from '@/components/dashboard/user-management/constants/user-management.constants';
-import type { UserRecord } from '@/components/dashboard/user-management/types/user-management.types';
-import { getInitials } from '@/components/dashboard/user-management/utils/user-management.utils';
-import { Alert, AlertDescription, AlertTitle } from '@/components/shared/ui/alert';
+"use client";
+
+import * as React from "react";
+import { useState } from "react";
+import Image from "next/image";
+import { toast } from "sonner";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/shared/ui/alert-dialog';
-import { Avatar, AvatarFallback } from '@/components/shared/ui/avatar';
-import { Badge } from '@/components/shared/ui/badge';
-import { Button } from '@/components/shared/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card';
-import { Label } from '@/components/shared/ui/label';
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/shared/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
-import { cn } from '@/lib/utils';
+  X,
+  Mail,
+  Phone,
+  Copy,
+  ChevronDown,
+  MapPin,
+  Activity,
+  Heart,
+  Smartphone,
+  Shield,
+  MoreHorizontal,
+  UserCheck,
+  KeyRound,
+  OctagonPause,
+  Trash2,
+  LayoutDashboard,
+  BadgeCheck,
+  CircleDot,
+} from "lucide-react";
+import logoPng from "@/assets/images/Logo.png";
+import type { UserRecord } from "@/components/dashboard/user-management/types/user-management.types";
 
-const MetricCard = ({ title, value }: { title: string; value: string }) => (
-  <Card className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] shadow-[var(--db-shadow-card)] backdrop-blur-sm">
-    <CardHeader className="pb-2">
-      <CardTitle className="text-xs font-medium text-[var(--db-text-secondary)]">{title}</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p className="text-base font-semibold text-[var(--db-text-primary)]">{value}</p>
-    </CardContent>
-  </Card>
-);
+// ─── Theme tokens (from dashboardThemeDark) ────────────────────────────────
+const t = {
+  bgStart: "#0B0B15",
+  bgEnd: "#1A1333",
+  sidebarBg: "#0E0C1A",
+  cardBg: "#12101F",
+  cardElevatedBg: "#171526",
+  textPrimary: "#FFFFFF",
+  textSecondary: "#9CA3AF",
+  textMuted: "#6B7280",
+  borderSubtle: "rgba(255,255,255,0.10)",
+  borderSoft: "rgba(255,255,255,0.20)",
+  overlaySoft: "rgba(255,255,255,0.05)",
+  primary: "#2F6BFF",
+  secondary: "#7A3BFF",
+  accentEmerald: "#34D399",
+  accentOrange: "#FB923C",
+  accentRed: "#F87171",
+  shadowCard: "0 14px 30px rgba(0, 0, 0, 0.35)",
+};
 
-const UserDrawerContent = ({ user }: { user: UserRecord }) => {
+// ─── Types ──────────────────────────────────────────────────────────────────
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatar?: string;
+  status: "Active" | "Suspended" | "Inactive";
+  role: "Admin" | "Editor" | "Viewer";
+  lastActive: string;
+  totalSessions: number;
+  joined: string;
+  userSince: string;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+}
+
+interface UserManagementDrawerProps {
+  activeUser: UserRecord | null;
+  open: boolean;
+  onOpenChange: (next: boolean) => void;
+  onUpdateStatus?: (id: string, status: UserRecord["status"]) => void;
+  onImpersonate?: (id: string) => void;
+  onResetPassword?: (id: string) => void;
+  onSuspend?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
+
+// ─── Default mock user ───────────────────────────────────────────────────────
+const defaultUser: User = {
+  id: "USR-001",
+  name: "Robert Fox",
+  email: "robert.fox@example.com",
+  phone: "+1 202 555 0148",
+  avatar: undefined,
+  status: "Active",
+  role: "Admin",
+  lastActive: "2 minutes ago",
+  totalSessions: 128,
+  joined: "15 Jan 2024",
+  userSince: "15 Jan 2024 (128 days)",
+  emailVerified: true,
+  phoneVerified: true,
+};
+
+// ─── Tab definition ──────────────────────────────────────────────────────────
+const tabs = [
+  { key: "overview", label: "Overview", icon: LayoutDashboard },
+  { key: "location", label: "Location", icon: MapPin },
+  { key: "activity", label: "Activity", icon: Activity },
+  { key: "interests", label: "Interests", icon: Heart },
+  { key: "devices", label: "Devices", icon: Smartphone },
+  { key: "security", label: "Security", icon: Shield },
+  { key: "more", label: "More", icon: MoreHorizontal },
+];
+
+type UserIpEvent = "Login" | "Posting" | "Commenting" | "Interacting" | "Sharing";
+type UserActivityType = "like" | "comment" | "share" | "account_update" | "settings_update";
+
+interface UserIpLog {
+  id: string;
+  ip: string;
+  event: UserIpEvent;
+  at: string;
+  geo: {
+    city: string;
+    country: string;
+    lat: number;
+    lon: number;
+  };
+}
+
+interface UserActivityLog {
+  id: string;
+  at: string;
+  actorName: string;
+  type: UserActivityType;
+  targetType: "post" | "account" | "settings";
+  postId?: string;
+  postTitle?: string;
+  commentId?: string;
+  commentPreview?: string;
+  fullContent: string;
+}
+
+const GEO_POOL = [
+  { city: "New York", country: "USA", lat: 40.7128, lon: -74.006 },
+  { city: "London", country: "UK", lat: 51.5072, lon: -0.1276 },
+  { city: "Toronto", country: "Canada", lat: 43.6532, lon: -79.3832 },
+  { city: "Berlin", country: "Germany", lat: 52.52, lon: 13.405 },
+  { city: "Sydney", country: "Australia", lat: -33.8688, lon: 151.2093 },
+  { city: "San Francisco", country: "USA", lat: 37.7749, lon: -122.4194 },
+];
+
+const EVENT_POOL: UserIpEvent[] = ["Login", "Posting", "Commenting", "Interacting", "Sharing"];
+
+const ACTIVITY_POOL: Array<Omit<UserActivityLog, "id" | "at" | "actorName">> = [
+  {
+    type: "like",
+    targetType: "post",
+    postId: "POST-1001",
+    postTitle: "How we reduced moderation false-positives by 37%",
+    fullContent: "User liked this post after opening analytics insights from dashboard recommendations.",
+  },
+  {
+    type: "comment",
+    targetType: "post",
+    postId: "POST-1024",
+    postTitle: "Community safety policy updates",
+    commentId: "CMT-8491",
+    commentPreview: "This update makes escalation flow clearer.",
+    fullContent:
+      "Comment detail: This update makes escalation flow clearer. We should pin this in onboarding docs for moderators.",
+  },
+  {
+    type: "share",
+    targetType: "post",
+    postId: "POST-0991",
+    postTitle: "Creator spotlight: monthly highlights",
+    fullContent: "User shared this post to Telegram integration channel via one-click share.",
+  },
+  {
+    type: "account_update",
+    targetType: "account",
+    fullContent: "User updated profile name and notification preferences from account settings.",
+  },
+  {
+    type: "settings_update",
+    targetType: "settings",
+    fullContent: "User changed privacy settings: disabled public activity and enabled 2FA reminders.",
+  },
+];
+
+const hashFromText = (value: string) =>
+  value.split("").reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 100000, 7);
+
+const makeIp = (seed: number, offset: number) => {
+  const a = 23 + ((seed + offset * 11) % 200);
+  const b = 7 + ((seed + offset * 13) % 240);
+  const c = 19 + ((seed + offset * 17) % 220);
+  const d = 5 + ((seed + offset * 19) % 200);
+  return `${a}.${b}.${c}.${d}`;
+};
+
+const buildUserIpLogs = (user: User): UserIpLog[] => {
+  const seed = hashFromText(user.id + user.email);
+  return Array.from({ length: 8 }).map((_, idx) => {
+    const geo = GEO_POOL[(seed + idx) % GEO_POOL.length];
+    const event = EVENT_POOL[(seed + idx * 3) % EVENT_POOL.length];
+    return {
+      id: `${user.id}-ip-${idx + 1}`,
+      ip: makeIp(seed, idx + 1),
+      event,
+      at: `${idx + 1} ${idx === 0 ? "hour" : "hours"} ago`,
+      geo,
+    };
+  });
+};
+
+const buildUserActivities = (user: User): UserActivityLog[] => {
+  const seed = hashFromText(user.id + user.name);
+  return Array.from({ length: 10 }).map((_, idx) => {
+    const base = ACTIVITY_POOL[(seed + idx) % ACTIVITY_POOL.length];
+    return {
+      ...base,
+      id: `${user.id}-act-${idx + 1}`,
+      at: `${idx + 1}h ago`,
+      actorName: user.name,
+    };
+  });
+};
+
+// ─── Small helpers ───────────────────────────────────────────────────────────
+function CopyBtn({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
   return (
-    <div className="space-y-4">
-      <section className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] p-4">
-        <div className="flex items-start gap-3">
-          <Avatar className="h-14 w-14 border border-[var(--db-border-soft)]">
-            <AvatarFallback className="bg-[var(--db-overlay-strong)] text-sm font-semibold text-[var(--db-text-primary)]">
-              {getInitials(user.name)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="truncate text-lg font-semibold text-[var(--db-text-primary)]">{user.name}</h3>
-              <Badge className={cn('border', STATUS_CLASS[user.status])}>{user.status}</Badge>
+    <button
+      onClick={copy}
+      title="Copy"
+      style={{ color: copied ? t.accentEmerald : t.textMuted }}
+      className="ml-1.5 transition-colors hover:opacity-80 focus:outline-none"
+    >
+      <Copy size={13} />
+    </button>
+  );
+}
+
+function StatusPill({ status }: { status: User["status"] }) {
+  const map: Record<User["status"], { bg: string; border: string; text: string }> = {
+    Active: {
+      bg: "rgba(52,211,153,0.12)",
+      border: "rgba(52,211,153,0.35)",
+      text: t.accentEmerald,
+    },
+    Suspended: {
+      bg: "rgba(251,146,60,0.12)",
+      border: "rgba(251,146,60,0.35)",
+      text: t.accentOrange,
+    },
+    Inactive: {
+      bg: "rgba(107,114,128,0.15)",
+      border: "rgba(107,114,128,0.30)",
+      text: t.textMuted,
+    },
+  };
+  const s = map[status];
+  return (
+    <button
+      style={{
+        background: s.bg,
+        border: `1px solid ${s.border}`,
+        color: s.text,
+        borderRadius: 8,
+        padding: "5px 12px",
+        fontSize: 13,
+        fontWeight: 600,
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        cursor: "pointer",
+      }}
+    >
+      {status}
+      <ChevronDown size={13} />
+    </button>
+  );
+}
+
+function RoleBadge({ role }: { role: string }) {
+  return (
+    <span
+      style={{
+        background: "rgba(47,107,255,0.18)",
+        color: "#7EB3FF",
+        border: "1px solid rgba(47,107,255,0.35)",
+        borderRadius: 6,
+        padding: "3px 10px",
+        fontSize: 12,
+        fontWeight: 600,
+      }}
+    >
+      {role}
+    </span>
+  );
+}
+
+function ActiveBadge({ label }: { label: string }) {
+  return (
+    <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+      <span style={{ color: t.textPrimary }}>{label}</span>
+      <CircleDot size={13} color={t.accentEmerald} fill={t.accentEmerald} />
+    </span>
+  );
+}
+
+function InfoRow({
+  left,
+  right,
+}: {
+  left: React.ReactNode;
+  right: React.ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        borderBottom: `1px solid ${t.borderSubtle}`,
+      }}
+    >
+      {/* Left cell */}
+      <div
+        style={{
+          padding: "14px 16px",
+          borderRight: `1px solid ${t.borderSubtle}`,
+        }}
+      >
+        {left}
+      </div>
+      {/* Right cell */}
+      <div style={{ padding: "14px 16px" }}>{right}</div>
+    </div>
+  );
+}
+
+function InfoCell({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+      <span style={{ color: t.textMuted, fontSize: 13 }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 500, color: t.textPrimary }}>{value}</span>
+    </div>
+  );
+}
+
+// ─── Main drawer ─────────────────────────────────────────────────────────────
+const mapRecordToUser = (record: UserRecord): User => {
+  const days = (() => {
+    const parsed = Date.parse(record.joinedDate);
+    if (Number.isNaN(parsed)) return null;
+    const deltaMs = Date.now() - parsed;
+    return Math.max(0, Math.floor(deltaMs / (1000 * 60 * 60 * 24)));
+  })();
+
+  return {
+    id: record.id,
+    name: record.name,
+    email: record.email,
+    phone: record.phone,
+    avatar: undefined,
+    status: record.status === "Pending" ? "Inactive" : record.status,
+    role: (record.role as unknown as User["role"]) ?? "Viewer",
+    lastActive: record.lastActive,
+    totalSessions: record.sessions,
+    joined: record.joinedDate,
+    userSince: days === null ? record.joinedDate : `${record.joinedDate} (${days} days)`,
+    emailVerified: record.emailVerified,
+    phoneVerified: record.phoneVerified,
+  };
+};
+
+const NOTE_KEY_PREFIX = "cb:um:userNote:";
+
+export const UserManagementDrawer = ({
+  activeUser,
+  open,
+  onOpenChange,
+  onUpdateStatus,
+  onImpersonate,
+  onResetPassword,
+  onSuspend,
+  onDelete,
+}: UserManagementDrawerProps) => {
+  const user = activeUser ? mapRecordToUser(activeUser) : defaultUser;
+  const [activeTab, setActiveTab] = useState("overview");
+  const [note, setNote] = useState("");
+  const [noteSaved, setNoteSaved] = useState(false);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [adminActionLog, setAdminActionLog] = useState<string[]>([]);
+  const [controlsState, setControlsState] = useState({
+    forceMfa: false,
+    restrictPosting: false,
+    readOnlyMode: false,
+  });
+
+  const noteStorageKey = `${NOTE_KEY_PREFIX}${user.id}`;
+  const ipLogs = React.useMemo(() => buildUserIpLogs(user), [user]);
+  const activities = React.useMemo(() => buildUserActivities(user), [user]);
+  const selectedActivity = React.useMemo(
+    () => activities.find((entry) => entry.id === selectedActivityId) ?? null,
+    [activities, selectedActivityId],
+  );
+  const primaryIp = ipLogs[0]?.ip ?? "N/A";
+
+  const logAdminAction = (label: string) => {
+    setAdminActionLog((prev) => [`${new Date().toLocaleTimeString()} • ${label}`, ...prev].slice(0, 10));
+  };
+
+  // Load per-user note when drawer opens / user changes
+  React.useEffect(() => {
+    if (!open) return;
+    try {
+      const saved = localStorage.getItem(noteStorageKey);
+      setNote(saved ?? "");
+    } catch (error) {
+      void error;
+      setNote("");
+    }
+    setNoteSaved(false);
+    setActiveTab("overview");
+    setSelectedActivityId(null);
+    setAdminActionLog([]);
+    setControlsState({
+      forceMfa: false,
+      restrictPosting: false,
+      readOnlyMode: false,
+    });
+  }, [noteStorageKey, open]);
+
+  const onClose = () => onOpenChange(false);
+
+  const handleSaveNote = () => {
+    if (!note.trim()) return;
+    try {
+      localStorage.setItem(noteStorageKey, note.trim());
+    } catch (error) {
+      void error;
+    }
+    setNoteSaved(true);
+    setTimeout(() => setNoteSaved(false), 2000);
+  };
+
+  if (!open || activeUser === null) return null;
+
+  return (
+    /* Backdrop */
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.55)",
+        backdropFilter: "blur(4px)",
+        zIndex: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "flex-end",
+      }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      {/* Drawer panel */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: 560,
+          height: "100dvh",
+          background: `linear-gradient(160deg, ${t.bgStart} 0%, ${t.bgEnd} 100%)`,
+          borderLeft: `1px solid ${t.borderSubtle}`,
+          display: "flex",
+          flexDirection: "column",
+          overflowY: "auto",
+          boxShadow: "-20px 0 60px rgba(0,0,0,0.5)",
+          fontFamily: "'DM Sans', 'Geist', system-ui, sans-serif",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ── Header ─────────────────────────────────────────────────── */}
+        <div
+          style={{
+            padding: "20px 24px 0",
+            background: t.sidebarBg,
+            borderBottom: `1px solid ${t.borderSubtle}`,
+            flexShrink: 0,
+          }}
+        >
+          {/* Top row: avatar + info + status + close */}
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 16 }}>
+            {/* Avatar */}
+            <div style={{ position: "relative", flexShrink: 0 }}>
+              <Image
+                src={user.avatar ?? logoPng}
+                alt={user.name}
+                width={64}
+                height={64}
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: "50%",
+                  border: `2px solid ${t.borderSoft}`,
+                  objectFit: "cover",
+                }}
+              />
+              {/* Online dot */}
+              <span
+                style={{
+                  position: "absolute",
+                  bottom: 2,
+                  right: 2,
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: t.accentEmerald,
+                  border: `2px solid ${t.sidebarBg}`,
+                }}
+              />
             </div>
-            <p className="mt-0.5 truncate text-xs text-[var(--db-text-secondary)]">{user.id}</p>
-            <div className="mt-2 flex flex-wrap gap-3 text-xs text-[var(--db-text-secondary)]">
-              <span className="inline-flex items-center gap-1">
-                <UserRound className="h-3.5 w-3.5" />
-                {user.email}
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <Phone className="h-3.5 w-3.5" />
-                {user.phone}
-              </span>
+
+            {/* Name / ID / contact */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <span
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 700,
+                    color: t.textPrimary,
+                    letterSpacing: "-0.3px",
+                  }}
+                >
+                  {user.name}
+                </span>
+                <BadgeCheck size={18} color={t.primary} fill={t.primary} style={{ flexShrink: 0 }} />
+              </div>
+              <div style={{ color: t.textMuted, fontSize: 12, marginTop: 2 }}>
+                ID: {user.id} • IP: {primaryIp}
+              </div>
+              <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Mail size={12} color={t.textMuted} />
+                  <span style={{ fontSize: 12, color: t.textSecondary }}>{user.email}</span>
+                  <CopyBtn text={user.email} />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Phone size={12} color={t.textMuted} />
+                  <span style={{ fontSize: 12, color: t.textSecondary }}>{user.phone}</span>
+                  <CopyBtn text={user.phone} />
+                </div>
+              </div>
             </div>
+
+            {/* Status + close */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                gap: 10,
+                flexShrink: 0,
+              }}
+            >
+              <button
+                onClick={onClose}
+                style={{
+                  background: t.overlaySoft,
+                  border: `1px solid ${t.borderSubtle}`,
+                  borderRadius: 8,
+                  width: 30,
+                  height: 30,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: t.textMuted,
+                }}
+              >
+                <X size={15} />
+              </button>
+              <StatusPill status={user.status} />
+            </div>
+          </div>
+
+          {/* Tab strip */}
+          <div
+            style={{
+              display: "flex",
+              gap: 0,
+              overflowX: "auto",
+              scrollbarWidth: "none",
+            }}
+          >
+            {tabs.map(({ key, label, icon: Icon }) => {
+              const active = activeTab === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "10px 14px",
+                    fontSize: 13,
+                    fontWeight: active ? 600 : 400,
+                    color: active ? t.primary : t.textMuted,
+                    background: "transparent",
+                    border: "none",
+                    borderBottom: `2px solid ${active ? t.primary : "transparent"}`,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                    transition: "color 0.15s, border-color 0.15s",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon size={14} />
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </section>
 
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="h-auto w-full justify-start overflow-x-auto rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] p-1">
-          {['Overview', 'Location & Devices', 'Activity Timeline', 'Security', 'Permissions', 'Risk & Flags'].map((tab) => (
-            <TabsTrigger
-              key={tab}
-              value={tab.toLowerCase().replace(/\s+&\s+|\s+/g, '-')}
-              className="text-xs data-[state=active]:bg-[color-mix(in_srgb,var(--db-primary)_20%,transparent)] data-[state=active]:text-[var(--db-text-primary)]"
-            >
-              {tab}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {/* ── Body ───────────────────────────────────────────────────── */}
+        <div style={{ flex: 1, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 20 }}>
 
-        <TabsContent value="overview">
-          <div className="grid grid-cols-2 gap-2">
-            <MetricCard title="Role" value={user.role} />
-            <MetricCard title="Status" value={user.status} />
-            <MetricCard title="Last Active" value={user.lastActive} />
-            <MetricCard title="Total Sessions" value={`${user.sessions}`} />
-            <MetricCard title="Email Verified" value={user.emailVerified ? 'Yes' : 'No'} />
-            <MetricCard title="Phone Verified" value={user.phoneVerified ? 'Yes' : 'No'} />
-          </div>
-        </TabsContent>
+          {activeTab === "overview" && (
+            <>
+              {/* Overview card */}
+              <section
+                style={{
+                  background: t.cardBg,
+                  borderRadius: 14,
+                  border: `1px solid ${t.borderSubtle}`,
+                  overflow: "hidden",
+                  boxShadow: t.shadowCard,
+                }}
+              >
+                <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                    Overview
+                  </span>
+                </div>
 
-        <TabsContent value="location-devices">
-          <Card className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]">
-            <CardContent className="space-y-3 p-4 text-sm text-[var(--db-text-secondary)]">
-              <p className="inline-flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[var(--db-primary)]" />
-                Current location: {user.location}
-              </p>
-              <p className="inline-flex items-center gap-2">
-                <Laptop className="h-4 w-4" />
-                Browser: Chrome 136 • OS: Windows 11
-              </p>
-              <p className="inline-flex items-center gap-2">
-                <Smartphone className="h-4 w-4" />
-                Device fingerprint: {user.id.toLowerCase()}-a81b
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="activity-timeline">
-          <Card className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]">
-            <CardContent className="space-y-4 p-4">
-              {['Signed in from New York', 'Viewed analytics', 'Updated profile preferences', 'Created 2 posts and 11 comments'].map((event, idx) => (
-                <div key={event} className="flex gap-3">
-                  <span className="mt-1.5 h-2.5 w-2.5 rounded-full bg-[var(--db-primary)]" />
-                  <div>
-                    <p className="text-sm text-[var(--db-text-primary)]">{event}</p>
-                    <p className="text-xs text-[var(--db-text-secondary)]">{idx + 1}h ago</p>
+                {/* Row 1 */}
+                <InfoRow
+                  left={<InfoCell label="Role" value={<RoleBadge role={user.role} />} />}
+                  right={
+                    <InfoCell
+                      label="Last Active"
+                      value={<ActiveBadge label={user.lastActive} />}
+                    />
+                  }
+                />
+                {/* Row 2 */}
+                <InfoRow
+                  left={
+                    <InfoCell
+                      label="Status"
+                      value={
+                        <span
+                          style={{
+                            background: "rgba(52,211,153,0.12)",
+                            color: t.accentEmerald,
+                            border: `1px solid rgba(52,211,153,0.30)`,
+                            borderRadius: 6,
+                            padding: "2px 8px",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {user.status}
+                        </span>
+                      }
+                    />
+                  }
+                  right={<InfoCell label="Total Sessions" value={user.totalSessions} />}
+                />
+                {/* Row 3 */}
+                <InfoRow
+                  left={<InfoCell label="Joined" value={user.joined} />}
+                  right={
+                    <InfoCell
+                      label="Email Verified"
+                      value={
+                        <span style={{ color: t.accentEmerald, fontWeight: 600 }}>
+                          {user.emailVerified ? "Yes" : "No"}
+                        </span>
+                      }
+                    />
+                  }
+                />
+                {/* Row 4 — no bottom border */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                  <div style={{ padding: "14px 16px", borderRight: `1px solid ${t.borderSubtle}` }}>
+                    <InfoCell label="User Since" value={user.userSince} />
+                  </div>
+                  <div style={{ padding: "14px 16px" }}>
+                    <InfoCell
+                      label="Phone Verified"
+                      value={
+                        <span style={{ color: t.accentEmerald, fontWeight: 600 }}>
+                          {user.phoneVerified ? "Yes" : "No"}
+                        </span>
+                      }
+                    />
                   </div>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </section>
 
-        <TabsContent value="security">
-          <Card className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]">
-            <CardContent className="space-y-3 p-4 text-sm text-[var(--db-text-secondary)]">
-              <p className="inline-flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-[var(--db-accent-emerald)]" />
-                2FA enabled
-              </p>
-              <p className="inline-flex items-center gap-2">
-                <Clock3 className="h-4 w-4" />
-                Last password reset: 37 days ago
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="permissions">
-          <Card className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]">
-            <CardContent className="space-y-3 p-4">
-              <div className="grid grid-cols-2 gap-2">
-                <Label className="text-[var(--db-text-secondary)]">Role</Label>
-                <Badge className={cn('w-fit border', ROLE_CLASS[user.role])}>{user.role}</Badge>
-                <Label className="text-[var(--db-text-secondary)]">Admin rights</Label>
-                <p className="text-sm text-[var(--db-text-primary)]">{user.role === 'Admin' ? 'Granted' : 'Limited'}</p>
-                <Label className="text-[var(--db-text-secondary)]">API Access</Label>
-                <p className="text-sm text-[var(--db-text-primary)]">{user.role === 'Admin' ? 'Full' : 'Read only'}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="risk-flags">
-          <Card className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)]">
-            <CardContent className="space-y-3 p-4">
-              <Alert className="border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)]">
-                <ShieldAlert className="h-4 w-4 text-[var(--db-accent-orange)]" />
-                <AlertTitle className="text-[var(--db-text-primary)]">Fraud Score: {user.fraudScore}%</AlertTitle>
-                <AlertDescription className="text-[var(--db-text-secondary)]">AI confidence suggests moderate risk; monitor unusual activity.</AlertDescription>
-              </Alert>
-              <Alert className="border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)]">
-                <AlertTriangle className="h-4 w-4 text-[var(--db-accent-red)]" />
-                <AlertTitle className="text-[var(--db-text-primary)]">Spam Risk: {user.spamRisk}%</AlertTitle>
-                <AlertDescription className="text-[var(--db-text-secondary)]">2 recent reports in the last 7 days.</AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <section className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] p-4">
-        <h4 className="text-sm font-semibold text-[var(--db-text-primary)]">Quick Actions</h4>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <Button size="sm" variant="outline" className="border-[var(--db-border-soft)] bg-[var(--db-card-elevated)] text-[var(--db-text-primary)]">
-            <UserCog className="mr-1.5 h-3.5 w-3.5" />
-            Impersonate User
-          </Button>
-          <Button size="sm" variant="outline" className="border-[var(--db-border-soft)] bg-[var(--db-card-elevated)] text-[var(--db-text-primary)]">
-            <Shield className="mr-1.5 h-3.5 w-3.5" />
-            Reset Password
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                size="sm"
-                className="bg-[color-mix(in_srgb,var(--db-accent-orange)_18%,transparent)] text-[var(--db-accent-orange)] hover:bg-[color-mix(in_srgb,var(--db-accent-orange)_28%,transparent)]"
+              {/* Quick Actions */}
+              <section
+                style={{
+                  background: t.cardBg,
+                  borderRadius: 14,
+                  border: `1px solid ${t.borderSubtle}`,
+                  overflow: "hidden",
+                  boxShadow: t.shadowCard,
+                }}
               >
-                Suspend User
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)] text-[var(--db-text-primary)]">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Suspend user?</AlertDialogTitle>
-                <AlertDialogDescription>This user will lose access until manually reactivated.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="border-[var(--db-border-soft)] bg-transparent text-[var(--db-text-primary)]">Cancel</AlertDialogCancel>
-                <AlertDialogAction className="bg-[var(--db-accent-orange)] text-white hover:opacity-90">Confirm suspend</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="sm" variant="destructive">
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                Delete User
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)] text-[var(--db-text-primary)]">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete user permanently?</AlertDialogTitle>
-                <AlertDialogDescription>This action cannot be undone. All linked records may become orphaned.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="border-[var(--db-border-soft)] bg-transparent text-[var(--db-text-primary)]">Cancel</AlertDialogCancel>
-                <AlertDialogAction className="bg-[var(--db-accent-red)] text-white hover:opacity-90">Delete</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                    Quick Actions
+                  </span>
+                </div>
+                <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                  {/* Row 1 */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <ActionBtn
+                      icon={<UserCheck size={14} />}
+                      label="Impersonate"
+                      onClick={() => onImpersonate?.(activeUser.id)}
+                    />
+                    <ActionBtn
+                      icon={<KeyRound size={14} />}
+                      label="Reset Password"
+                      onClick={() => onResetPassword?.(activeUser.id)}
+                    />
+                  </div>
+                  {/* Row 2 */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <ActionBtn
+                      icon={<OctagonPause size={14} />}
+                      label="Suspend User"
+                      variant="warning"
+                      onClick={() => {
+                        onUpdateStatus?.(activeUser.id, "Suspended");
+                        onSuspend?.(activeUser.id);
+                      }}
+                    />
+                    <ActionBtn
+                      icon={<Trash2 size={14} />}
+                      label="Delete User"
+                      variant="danger"
+                      onClick={() => onDelete?.(activeUser.id)}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* Notes */}
+              <section
+                style={{
+                  background: t.cardBg,
+                  borderRadius: 14,
+                  border: `1px solid ${t.borderSubtle}`,
+                  overflow: "hidden",
+                  boxShadow: t.shadowCard,
+                }}
+              >
+                <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                  <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                    Notes
+                  </span>
+                </div>
+                <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Add a note about this user..."
+                    rows={4}
+                    style={{
+                      width: "100%",
+                      background: t.cardElevatedBg,
+                      border: `1px solid ${t.borderSubtle}`,
+                      borderRadius: 10,
+                      padding: "12px 14px",
+                      fontSize: 13,
+                      color: t.textPrimary,
+                      resize: "vertical",
+                      outline: "none",
+                      fontFamily: "inherit",
+                      boxSizing: "border-box",
+                      transition: "border-color 0.15s",
+                    }}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = t.primary)}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = t.borderSubtle)}
+                  />
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <button
+                      onClick={handleSaveNote}
+                      style={{
+                        background: noteSaved
+                          ? "rgba(52,211,153,0.2)"
+                          : t.primary,
+                        color: noteSaved ? t.accentEmerald : "#fff",
+                        border: noteSaved
+                          ? `1px solid rgba(52,211,153,0.4)`
+                          : "none",
+                        borderRadius: 8,
+                        padding: "9px 20px",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "background 0.2s, color 0.2s",
+                      }}
+                    >
+                      {noteSaved ? "Saved ✓" : "Save Note"}
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* Placeholder for other tabs */}
+          {activeTab !== "overview" && (
+            <>
+              {activeTab === "location" && (
+                <section
+                  style={{
+                    background: t.cardBg,
+                    borderRadius: 14,
+                    border: `1px solid ${t.borderSubtle}`,
+                    overflow: "hidden",
+                    boxShadow: t.shadowCard,
+                  }}
+                >
+                  <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                    <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                      IP & Geo Location History
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    {ipLogs.map((entry) => (
+                      <div
+                        key={entry.id}
+                        style={{
+                          padding: "12px 16px",
+                          borderBottom: `1px solid ${t.borderSubtle}`,
+                          display: "grid",
+                          gridTemplateColumns: "1.2fr 1fr 1fr",
+                          gap: 10,
+                          alignItems: "center",
+                        }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                          <span style={{ color: t.textPrimary, fontSize: 13, fontWeight: 600 }}>{entry.ip}</span>
+                          <span style={{ color: t.textMuted, fontSize: 12 }}>{entry.event} • {entry.at}</span>
+                        </div>
+                        <div style={{ color: t.textSecondary, fontSize: 12 }}>
+                          {entry.geo.city}, {entry.geo.country}
+                        </div>
+                        <div style={{ color: t.textMuted, fontSize: 12, textAlign: "right" }}>
+                          {entry.geo.lat.toFixed(4)}, {entry.geo.lon.toFixed(4)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {activeTab === "activity" && (
+                <>
+                  <section
+                    style={{
+                      background: t.cardBg,
+                      borderRadius: 14,
+                      border: `1px solid ${t.borderSubtle}`,
+                      overflow: "hidden",
+                      boxShadow: t.shadowCard,
+                    }}
+                  >
+                    <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                      <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                        User Activity Feed
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      {activities.map((entry) => (
+                        <button
+                          key={entry.id}
+                          onClick={() => setSelectedActivityId(entry.id)}
+                          style={{
+                            all: "unset",
+                            cursor: "pointer",
+                            padding: "12px 16px",
+                            borderBottom: `1px solid ${t.borderSubtle}`,
+                            background: selectedActivityId === entry.id ? t.overlaySoft : "transparent",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 4,
+                          }}
+                        >
+                          <span style={{ color: t.textPrimary, fontSize: 13, fontWeight: 600 }}>
+                            {entry.targetType === "post"
+                              ? `${entry.actorName} ${entry.type}d post: ${entry.postTitle ?? "Untitled"}`
+                              : `${entry.actorName} ${entry.type.replace("_", " ")}`
+                            }
+                          </span>
+                          <span style={{ color: t.textSecondary, fontSize: 12 }}>
+                            {entry.at}
+                            {entry.commentPreview ? ` • ${entry.commentPreview}` : ""}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+
+                  {selectedActivity && (
+                    <section
+                      style={{
+                        background: t.cardBg,
+                        borderRadius: 14,
+                        border: `1px solid ${t.borderSubtle}`,
+                        overflow: "hidden",
+                        boxShadow: t.shadowCard,
+                      }}
+                    >
+                      <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                        <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                          Activity Details
+                        </span>
+                      </div>
+                      <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                        <div style={{ color: t.textSecondary, fontSize: 12 }}>
+                          {selectedActivity.at} • {selectedActivity.actorName}
+                        </div>
+                        {selectedActivity.postTitle ? (
+                          <div style={{ color: t.textPrimary, fontSize: 14, fontWeight: 600 }}>
+                            {selectedActivity.postTitle}
+                          </div>
+                        ) : null}
+                        <div style={{ color: t.textSecondary, fontSize: 13, lineHeight: 1.55 }}>
+                          {selectedActivity.fullContent}
+                        </div>
+                        <button
+                          onClick={() =>
+                            toast.message(
+                              selectedActivity.commentId
+                                ? `Open comment ${selectedActivity.commentId}`
+                                : `Open post ${selectedActivity.postId ?? "detail"}`,
+                            )
+                          }
+                          style={{
+                            alignSelf: "flex-start",
+                            background: t.overlaySoft,
+                            border: `1px solid ${t.borderSubtle}`,
+                            color: t.textPrimary,
+                            borderRadius: 8,
+                            padding: "8px 12px",
+                            fontSize: 12,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Open Full {selectedActivity.commentId ? "Comment" : "Post"}
+                        </button>
+                      </div>
+                    </section>
+                  )}
+
+                  <section
+                    style={{
+                      background: t.cardBg,
+                      borderRadius: 14,
+                      border: `1px solid ${t.borderSubtle}`,
+                      overflow: "hidden",
+                      boxShadow: t.shadowCard,
+                    }}
+                  >
+                    <div style={{ padding: "14px 16px", borderBottom: `1px solid ${t.borderSubtle}` }}>
+                      <span style={{ fontWeight: 600, fontSize: 14, color: t.textPrimary }}>
+                        Admin Activity Controls
+                      </span>
+                    </div>
+                    <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                      <ActionBtn
+                        icon={<Shield size={14} />}
+                        label={controlsState.forceMfa ? "Disable Force MFA" : "Force MFA"}
+                        onClick={() =>
+                          setControlsState((prev) => {
+                            const next = { ...prev, forceMfa: !prev.forceMfa };
+                            logAdminAction(next.forceMfa ? "Force MFA enabled" : "Force MFA disabled");
+                            return next;
+                          })
+                        }
+                      />
+                      <ActionBtn
+                        icon={<OctagonPause size={14} />}
+                        label={controlsState.restrictPosting ? "Allow Posting" : "Restrict Posting"}
+                        variant="warning"
+                        onClick={() =>
+                          setControlsState((prev) => {
+                            const next = { ...prev, restrictPosting: !prev.restrictPosting };
+                            logAdminAction(next.restrictPosting ? "Posting restricted" : "Posting restored");
+                            return next;
+                          })
+                        }
+                      />
+                      <ActionBtn
+                        icon={<KeyRound size={14} />}
+                        label={controlsState.readOnlyMode ? "Disable Read-Only" : "Read-Only Mode"}
+                        onClick={() =>
+                          setControlsState((prev) => {
+                            const next = { ...prev, readOnlyMode: !prev.readOnlyMode };
+                            logAdminAction(next.readOnlyMode ? "Read-only mode enabled" : "Read-only mode disabled");
+                            return next;
+                          })
+                        }
+                      />
+                      <ActionBtn
+                        icon={<Trash2 size={14} />}
+                        label="Revoke Sessions"
+                        variant="danger"
+                        onClick={() => logAdminAction("All active sessions revoked")}
+                      />
+                    </div>
+                    <div style={{ padding: "0 16px 16px", display: "flex", flexDirection: "column", gap: 6 }}>
+                      <span style={{ color: t.textMuted, fontSize: 12, fontWeight: 600 }}>Recent Admin Actions</span>
+                      {adminActionLog.length === 0 ? (
+                        <span style={{ color: t.textMuted, fontSize: 12 }}>No actions yet.</span>
+                      ) : (
+                        adminActionLog.map((line) => (
+                          <span key={line} style={{ color: t.textSecondary, fontSize: 12 }}>
+                            {line}
+                          </span>
+                        ))
+                      )}
+                    </div>
+                  </section>
+                </>
+              )}
+
+              {activeTab !== "location" && activeTab !== "activity" && (
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: t.textMuted,
+                    fontSize: 14,
+                    gap: 8,
+                    background: t.cardBg,
+                    borderRadius: 14,
+                    border: `1px solid ${t.borderSubtle}`,
+                    padding: 40,
+                    minHeight: 200,
+                  }}
+                >
+                  <span style={{ fontSize: 32 }}>
+                    {tabs.find((t) => t.key === activeTab) && (() => {
+                      const T = tabs.find((tab) => tab.key === activeTab)!.icon;
+                      return <T size={36} />;
+                    })()}
+                  </span>
+                  <span style={{ color: t.textSecondary, fontWeight: 500 }}>
+                    {tabs.find((t) => t.key === activeTab)?.label} tab content
+                  </span>
+                  <span style={{ color: t.textMuted, fontSize: 12 }}>
+                    This section is under construction
+                  </span>
+                </div>
+              )}
+            </>
+          )}
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
-type UserManagementDrawerProps = {
-  activeUser: UserRecord | null;
-  open: boolean;
-  onOpenChange: (next: boolean) => void;
-};
+// ─── Action button ────────────────────────────────────────────────────────────
+function ActionBtn({
+  icon,
+  label,
+  variant = "default",
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  variant?: "default" | "warning" | "danger";
+  onClick?: () => void;
+}) {
+  const styles: Record<typeof variant, { bg: string; border: string; color: string; hoverBg: string }> = {
+    default: {
+      bg: "rgba(255,255,255,0.04)",
+      border: "rgba(255,255,255,0.10)",
+      color: "#9CA3AF",
+      hoverBg: "rgba(255,255,255,0.08)",
+    },
+    warning: {
+      bg: "rgba(251,146,60,0.08)",
+      border: "rgba(251,146,60,0.40)",
+      color: "#FB923C",
+      hoverBg: "rgba(251,146,60,0.15)",
+    },
+    danger: {
+      bg: "rgba(248,113,113,0.10)",
+      border: "rgba(248,113,113,0.45)",
+      color: "#F87171",
+      hoverBg: "rgba(248,113,113,0.18)",
+    },
+  };
+  const s = styles[variant];
+  const [hovered, setHovered] = useState(false);
 
-export const UserManagementDrawer = ({ activeUser, open, onOpenChange }: UserManagementDrawerProps) => {
   return (
-    <Sheet open={open && activeUser !== null} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        overlayClassName="bg-[color-mix(in_srgb,var(--db-bg-start)_70%,black)]"
-        className="w-full border-l border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)] p-0 text-[var(--db-text-primary)] shadow-[var(--db-shadow-card-hover)] backdrop-blur-md sm:max-w-[520px]"
-      >
-        <SheetTitle className="sr-only">User Management Drawer</SheetTitle>
-        <SheetDescription className="sr-only">User details and risk controls in tabbed sections.</SheetDescription>
-        {activeUser ? (
-          <div className="h-full overflow-y-auto p-4">
-            <UserDrawerContent user={activeUser} />
-          </div>
-        ) : null}
-      </SheetContent>
-    </Sheet>
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 7,
+        padding: "11px 0",
+        background: hovered ? s.hoverBg : s.bg,
+        border: `1px solid ${s.border}`,
+        borderRadius: 10,
+        color: s.color,
+        fontSize: 13,
+        fontWeight: 500,
+        cursor: "pointer",
+        transition: "background 0.15s",
+        width: "100%",
+      }}
+    >
+      {icon}
+      {label}
+    </button>
   );
-};
+}

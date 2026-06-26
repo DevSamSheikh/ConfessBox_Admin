@@ -89,7 +89,24 @@ export const UserManagementPage = () => {
         />
       </div>
 
-      <UserManagementDrawer activeUser={activeUser} open={drawerOpen} onOpenChange={setDrawerOpen} />
+      <UserManagementDrawer
+        activeUser={activeUser}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        onUpdateStatus={updateUserStatus}
+        onImpersonate={(id) => {
+          void id;
+        }}
+        onResetPassword={(id) => {
+          void id;
+        }}
+        onSuspend={(id) => {
+          void id;
+        }}
+        onDelete={(id) => {
+          void id;
+        }}
+      />
     </div>
   );
 };
