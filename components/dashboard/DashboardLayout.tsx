@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, type CSSProperties } from 'react';
 import type React from 'react';
 import { useTheme } from 'next-themes';
 import {
@@ -19,23 +19,16 @@ export const DashboardLayout = ({
   rightPanel: React.ReactNode;
 }) => {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const themeVars = useMemo(() => {
-    if (!mounted) {
-      return dashboardThemeVarsDark;
-    }
     return resolvedTheme === 'light' ? dashboardThemeVarsLight : dashboardThemeVarsDark;
-  }, [mounted, resolvedTheme]);
+  }, [resolvedTheme]);
 
   return (
     <div
       className="min-h-screen w-full flex flex-col bg-gradient-to-br from-[var(--db-bg-start)] to-[var(--db-bg-end)] xl:flex-row"
       style={themeVars as CSSProperties}
+      suppressHydrationWarning
     >
       {sidebar}
       <div className="flex-1 min-w-0">{main}</div>

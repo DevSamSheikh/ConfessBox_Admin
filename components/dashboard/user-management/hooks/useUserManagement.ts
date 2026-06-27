@@ -104,6 +104,18 @@ export const useUserManagement = () => {
 
   const updateUserStatus = (id: string, status: UserStatus) => {
     setUsers((prev) => prev.map((user) => (user.id === id ? { ...user, status } : user)));
+    setActiveUser((prev) => (prev?.id === id ? { ...prev, status } : prev));
+  };
+
+  const bulkUpdateStatus = (status: UserStatus) => {
+    if (selectedIds.size === 0) {
+      return;
+    }
+    setUsers((prev) =>
+      prev.map((user) => (selectedIds.has(user.id) ? { ...user, status } : user)),
+    );
+    setActiveUser((prev) => (prev && selectedIds.has(prev.id) ? { ...prev, status } : prev));
+    setSelectedIds(new Set());
   };
 
   return {
@@ -134,5 +146,6 @@ export const useUserManagement = () => {
     toggleSingleSelect,
     updateUserRole,
     updateUserStatus,
+    bulkUpdateStatus,
   };
 };

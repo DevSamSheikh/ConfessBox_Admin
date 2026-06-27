@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { Heart, MessageSquare, UserPlus, Users } from 'lucide-react';
 import { buildModerationReportDetail } from '@/app/dashboard/moderation-report-detail';
 import {
@@ -12,16 +13,25 @@ import {
   dashboardTrend,
 } from '@/app/dashboard/dashboard-data';
 import { DonutChartCard } from '@/components/dashboard/DonutChartCard';
-import { Header } from '@/components/dashboard/Header';
 import { KPICard } from '@/components/dashboard/KPICard';
 import { LineChartCard } from '@/components/dashboard/LineChartCard';
-import { PostManagementDrawer } from '@/components/dashboard/drawers/PostManagementDrawer';
-import { ReportModerationDrawer } from '@/components/dashboard/ReportModerationDrawer';
 import { ReportsTable } from '@/components/dashboard/ReportsTable';
 import { TopPostsCard } from '@/components/dashboard/TopPostsCard';
 import { dashboardMainClassName } from '@/components/dashboard/dashboard/constants/dashboard.constants';
 import { useDashboard } from '@/components/dashboard/dashboard/hooks/useDashboard';
 import { formatCompactNumber } from '@/components/dashboard/dashboard/utils/dashboard.utils';
+
+const ReportModerationDrawer = dynamic(
+  () =>
+    import('@/components/dashboard/ReportModerationDrawer').then((module) => module.ReportModerationDrawer),
+  { ssr: false },
+);
+
+const PostManagementDrawer = dynamic(
+  () =>
+    import('@/components/dashboard/drawers/PostManagementDrawer').then((module) => module.PostManagementDrawer),
+  { ssr: false },
+);
 
 export const DashboardMain = () => {
   const {
@@ -36,9 +46,7 @@ export const DashboardMain = () => {
   } = useDashboard();
 
   return (
-    <main className={dashboardMainClassName}>
-        <Header profileName={dashboardProfile.displayName} profileInitials={dashboardProfile.initials} />
-
+    <div className={dashboardMainClassName}>
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4">
           <KPICard
             icon={<Users className="h-5 w-5 text-[var(--db-primary)]" />}
@@ -115,7 +123,7 @@ export const DashboardMain = () => {
           }}
           post={selectedTopPost}
         />
-    </main>
+    </div>
   );
 };
 

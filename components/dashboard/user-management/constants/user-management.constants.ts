@@ -152,3 +152,7 @@ export const ROLE_CLASS: Record<UserRole, string> = {
 };
 
 export const USER_PAGE_SIZE = 8;
+
+/** Checkbox styling for user-management table selection */
+export const USER_TABLE_CHECKBOX_CLASS =
+  'border-[var(--db-border-soft)] bg-transparent dark:bg-transparent data-[state=checked]:border-[var(--db-secondary)] data-[state=checked]:bg-[var(--db-secondary)] data-[state=checked]:text-white dark:data-[state=checked]:bg-[var(--db-secondary)]';

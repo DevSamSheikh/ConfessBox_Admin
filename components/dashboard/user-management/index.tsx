@@ -1,10 +1,18 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { UserManagementFilters } from '@/components/dashboard/user-management/components/UserManagementFilters';
 import { UserManagementMetricCard } from '@/components/dashboard/user-management/components/UserManagementMetricCard';
-import { UserManagementDrawer } from '@/components/dashboard/user-management/components/UserManagementDrawer';
 import { UserManagementTable } from '@/components/dashboard/user-management/components/UserManagementTable';
 import { useUserManagement } from '@/components/dashboard/user-management/hooks/useUserManagement';
+
+const UserManagementDrawer = dynamic(
+  () =>
+    import('@/components/dashboard/user-management/components/UserManagementDrawer').then(
+      (module) => module.UserManagementDrawer,
+    ),
+  { ssr: false },
+);
 
 export const UserManagementPage = () => {
   const {
@@ -35,6 +43,7 @@ export const UserManagementPage = () => {
     toggleSingleSelect,
     updateUserRole,
     updateUserStatus,
+    bulkUpdateStatus,
   } = useUserManagement();
 
   const totalUsers = users.length;
@@ -43,18 +52,9 @@ export const UserManagementPage = () => {
   const suspendedUsers = users.filter((user) => user.status === 'Suspended').length;
 
   return (
-    <div className="min-h-[100vh] w-full bg-gradient-to-br from-[var(--db-bg-start)] to-[var(--db-bg-end)] px-4 py-4 text-[var(--db-text-primary)] sm:px-6 sm:py-6">
+    <>
       <div className="mx-auto grid h-full max-w-[1800px] grid-cols-1 gap-4">
-        <UserManagementFilters
-          search={search}
-          onSearchChange={setSearch}
-          roleFilter={roleFilter}
-          onRoleFilterChange={setRoleFilter}
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          locationFilter={locationFilter}
-          onLocationFilterChange={setLocationFilter}
-        />
+      
 
         <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <UserManagementMetricCard title="Total Users" value={totalUsers.toLocaleString()} trend="+12.5% vs last month" />
@@ -66,6 +66,18 @@ export const UserManagementPage = () => {
           <UserManagementMetricCard title="New This Month" value={pendingUsers.toLocaleString()} trend="8.2% vs last month" />
           <UserManagementMetricCard title="Suspended Users" value={suspendedUsers.toLocaleString()} trend="Requires review" />
         </section>
+
+
+          <UserManagementFilters
+          search={search}
+          onSearchChange={setSearch}
+          roleFilter={roleFilter}
+          onRoleFilterChange={setRoleFilter}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          locationFilter={locationFilter}
+          onLocationFilterChange={setLocationFilter}
+        />
 
         <UserManagementTable
           selectedIds={selectedIds}
@@ -82,6 +94,7 @@ export const UserManagementPage = () => {
           }}
           onUpdateRole={updateUserRole}
           onUpdateStatus={updateUserStatus}
+          onBulkUpdateStatus={bulkUpdateStatus}
           currentPage={currentPage}
           totalPages={totalPages}
           totalUsersCount={sortedUsers.length}
@@ -107,6 +120,6 @@ export const UserManagementPage = () => {
           void id;
         }}
       />
-    </div>
+    </>
   );
 };

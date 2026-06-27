@@ -1,5 +1,6 @@
 import { ArrowDownUp, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
-import { ROLE_CLASS, STATUS_CLASS, USER_PAGE_SIZE } from '@/components/dashboard/user-management/constants/user-management.constants';
+import * as React from 'react';
+import { ROLE_CLASS, STATUS_CLASS, USER_PAGE_SIZE, USER_TABLE_CHECKBOX_CLASS } from '@/components/dashboard/user-management/constants/user-management.constants';
 import type { SortDirection, SortField, UserRecord, UserRole, UserStatus } from '@/components/dashboard/user-management/types/user-management.types';
 import { getInitials } from '@/components/dashboard/user-management/utils/user-management.utils';
 import { Avatar, AvatarFallback } from '@/components/shared/ui/avatar';
@@ -60,6 +61,7 @@ type UserManagementTableProps = {
   onOpenUser: (user: UserRecord) => void;
   onUpdateRole: (id: string, role: UserRole) => void;
   onUpdateStatus: (id: string, status: UserStatus) => void;
+  onBulkUpdateStatus: (status: UserStatus) => void;
   currentPage: number;
   totalPages: number;
   totalUsersCount: number;
@@ -78,11 +80,14 @@ export const UserManagementTable = ({
   onOpenUser,
   onUpdateRole,
   onUpdateStatus,
+  onBulkUpdateStatus,
   currentPage,
   totalPages,
   totalUsersCount,
   onPageChange,
 }: UserManagementTableProps) => {
+  const [bulkStatus, setBulkStatus] = React.useState<UserStatus>('Active');
+
   return (
     <section className="rounded-xl border border-[var(--db-border-subtle)] bg-[var(--db-card-bg)] p-3 shadow-[var(--db-shadow-card)] backdrop-blur-sm">
       {selectedIds.size > 0 ? (
@@ -90,15 +95,23 @@ export const UserManagementTable = ({
           <p className="text-sm text-[var(--db-text-primary)]">
             {selectedIds.size} user{selectedIds.size > 1 ? 's' : ''} selected
           </p>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="border-[var(--db-border-soft)] bg-[var(--db-card-elevated)] text-[var(--db-text-primary)]">
-              Bulk Role Update
-            </Button>
+          <div className="flex items-center gap-2">
+            <Select value={bulkStatus} onValueChange={(value) => setBulkStatus(value as UserStatus)}>
+              <SelectTrigger className={cn('h-8 w-[130px] border', STATUS_CLASS[bulkStatus])}>
+                <SelectValue placeholder="Bulk status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Suspended">Suspended</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               size="sm"
-              className="bg-[color-mix(in_srgb,var(--db-accent-orange)_18%,transparent)] text-[var(--db-accent-orange)] hover:bg-[color-mix(in_srgb,var(--db-accent-orange)_28%,transparent)]"
+              className="bg-[var(--db-primary)] text-white hover:bg-[var(--db-primary-hover)]"
+              onClick={() => onBulkUpdateStatus(bulkStatus)}
             >
-              Suspend Selected
+              Apply
             </Button>
           </div>
         </div>
@@ -109,7 +122,11 @@ export const UserManagementTable = ({
           <TableHeader className="sticky top-0 bg-[var(--db-card-elevated)]/95 backdrop-blur">
             <TableRow className="border-[var(--db-border-subtle)] hover:bg-transparent">
               <TableHead className="w-10">
-                <Checkbox checked={allVisibleSelected} onCheckedChange={(checked) => onToggleVisibleSelect(Boolean(checked))} />
+                <Checkbox
+                  checked={allVisibleSelected}
+                  onCheckedChange={(checked) => onToggleVisibleSelect(Boolean(checked))}
+                  className={USER_TABLE_CHECKBOX_CLASS}
+                />
               </TableHead>
               <SortableHead field="name" label="User" sortField={sortField} sortDirection={sortDirection} onSort={onSort} />
               <TableHead className="text-xs text-[var(--db-text-secondary)]">Email / Phone</TableHead>
@@ -129,7 +146,11 @@ export const UserManagementTable = ({
                 onClick={() => onOpenUser(user)}
               >
                 <TableCell onClick={(e) => e.stopPropagation()} className="align-middle">
-                  <Checkbox checked={selectedIds.has(user.id)} onCheckedChange={(checked) => onToggleSingleSelect(user.id, Boolean(checked))} />
+                  <Checkbox
+                    checked={selectedIds.has(user.id)}
+                    onCheckedChange={(checked) => onToggleSingleSelect(user.id, Boolean(checked))}
+                    className={USER_TABLE_CHECKBOX_CLASS}
+                  />
                 </TableCell>
                 <TableCell className="min-w-[220px]">
                   <div className="flex items-center gap-2">

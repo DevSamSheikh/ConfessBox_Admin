@@ -222,6 +222,14 @@ module.exports = {
             transform: 'translateX(-50%)',
           },
         },
+        'db-loader-shimmer': {
+          '0%': {
+            transform: 'translateX(-120%)',
+          },
+          '100%': {
+            transform: 'translateX(360%)',
+          },
+        },
       },
       animation: {
         tilt: 'tilt 10s linear infinite',
@@ -234,6 +242,7 @@ module.exports = {
         'fade-in-down-normal': 'fade-in-down 0.8s ease-in-out forwards',
         'fade-in-down-fast': 'fade-in-down 0.6s ease-in-out forwards',
         'fade-in-down-faster': 'fade-in-down 0.4s ease-in-out forwards',
+        'db-loader-shimmer': 'db-loader-shimmer 1.35s ease-in-out infinite',
         'rotate-left-to-right': 'rotate-left-to-right 3s ease-in-out infinite',
         'fade-in-down-normal-delay':
           'fade-in-down 0.8s ease-in-out 2s forwards',

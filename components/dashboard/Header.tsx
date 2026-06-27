@@ -9,17 +9,21 @@ import { Input } from '@/components/shared/ui/input';
 export const Header = ({
   profileName,
   profileInitials,
+  title = 'Dashboard',
+  subtitle,
 }: {
   profileName: string;
   profileInitials: string;
+  title?: string;
+  subtitle?: string;
 }) => {
+  const resolvedSubtitle = subtitle ?? `Hello ${profileName}, Welcome back!`;
+
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div className="min-w-0">
-        <div className="text-[var(--db-text-primary)] text-lg font-semibold">Dashboard</div>
-        <div className="text-[var(--db-text-secondary)] text-sm truncate">
-          Hello {profileName}, Welcome back!
-        </div>
+        <div className="text-[var(--db-text-primary)] text-lg font-semibold">{title}</div>
+        <div className="text-[var(--db-text-secondary)] text-sm truncate">{resolvedSubtitle}</div>
       </div>
 
       <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end lg:w-auto">

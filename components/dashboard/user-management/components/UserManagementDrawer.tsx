@@ -9,7 +9,6 @@ import {
   Mail,
   Phone,
   Copy,
-  ChevronDown,
   MapPin,
   Activity,
   Heart,
@@ -25,7 +24,10 @@ import {
   CircleDot,
 } from "lucide-react";
 import logoPng from "@/assets/images/Logo.png";
-import type { UserRecord } from "@/components/dashboard/user-management/types/user-management.types";
+import { ROLE_CLASS, STATUS_CLASS } from "@/components/dashboard/user-management/constants/user-management.constants";
+import type { UserRecord, UserRole, UserStatus } from "@/components/dashboard/user-management/types/user-management.types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/shared/ui/select";
+import { cn } from "@/lib/utils";
 
 // ─── Theme tokens (from dashboardThemeDark) ────────────────────────────────
 const t = {
@@ -55,8 +57,8 @@ interface User {
   email: string;
   phone: string;
   avatar?: string;
-  status: "Active" | "Suspended" | "Inactive";
-  role: "Admin" | "Editor" | "Viewer";
+  status: UserStatus;
+  role: UserRole;
   lastActive: string;
   totalSessions: number;
   joined: string;
@@ -240,61 +242,54 @@ function CopyBtn({ text }: { text: string }) {
   );
 }
 
-function StatusPill({ status }: { status: User["status"] }) {
-  const map: Record<User["status"], { bg: string; border: string; text: string }> = {
-    Active: {
-      bg: "rgba(52,211,153,0.12)",
-      border: "rgba(52,211,153,0.35)",
-      text: t.accentEmerald,
-    },
-    Suspended: {
-      bg: "rgba(251,146,60,0.12)",
-      border: "rgba(251,146,60,0.35)",
-      text: t.accentOrange,
-    },
-    Inactive: {
-      bg: "rgba(107,114,128,0.15)",
-      border: "rgba(107,114,128,0.30)",
-      text: t.textMuted,
-    },
-  };
-  const s = map[status];
+function StatusSelect({
+  userId,
+  status,
+  onUpdateStatus,
+}: {
+  userId: string;
+  status: UserStatus;
+  onUpdateStatus?: (id: string, status: UserStatus) => void;
+}) {
   return (
-    <button
-      style={{
-        background: s.bg,
-        border: `1px solid ${s.border}`,
-        color: s.text,
-        borderRadius: 8,
-        padding: "5px 12px",
-        fontSize: 13,
-        fontWeight: 600,
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        cursor: "pointer",
-      }}
+    <Select
+      value={status}
+      onValueChange={(value) => onUpdateStatus?.(userId, value as UserStatus)}
     >
-      {status}
-      <ChevronDown size={13} />
-    </button>
+      <SelectTrigger className={cn("h-8 w-[130px] border", STATUS_CLASS[status])}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="Active">Active</SelectItem>
+        <SelectItem value="Suspended">Suspended</SelectItem>
+        <SelectItem value="Pending">Pending</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }
 
-function RoleBadge({ role }: { role: string }) {
+function RoleBadge({ role }: { role: UserRole }) {
   return (
     <span
-      style={{
-        background: "rgba(47,107,255,0.18)",
-        color: "#7EB3FF",
-        border: "1px solid rgba(47,107,255,0.35)",
-        borderRadius: 6,
-        padding: "3px 10px",
-        fontSize: 12,
-        fontWeight: 600,
-      }}
+      className={cn(
+        "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold",
+        ROLE_CLASS[role],
+      )}
     >
       {role}
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: UserStatus }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold",
+        STATUS_CLASS[status],
+      )}
+    >
+      {status}
     </span>
   );
 }
@@ -368,8 +363,8 @@ const mapRecordToUser = (record: UserRecord): User => {
     email: record.email,
     phone: record.phone,
     avatar: undefined,
-    status: record.status === "Pending" ? "Inactive" : record.status,
-    role: (record.role as unknown as User["role"]) ?? "Viewer",
+    status: record.status,
+    role: record.role,
     lastActive: record.lastActive,
     totalSessions: record.sessions,
     joined: record.joinedDate,
@@ -583,7 +578,7 @@ export const UserManagementDrawer = ({
               >
                 <X size={15} />
               </button>
-              <StatusPill status={user.status} />
+              <StatusSelect userId={user.id} status={user.status} onUpdateStatus={onUpdateStatus} />
             </div>
           </div>
 
@@ -663,21 +658,7 @@ export const UserManagementDrawer = ({
                   left={
                     <InfoCell
                       label="Status"
-                      value={
-                        <span
-                          style={{
-                            background: "rgba(52,211,153,0.12)",
-                            color: t.accentEmerald,
-                            border: `1px solid rgba(52,211,153,0.30)`,
-                            borderRadius: 6,
-                            padding: "2px 8px",
-                            fontSize: 12,
-                            fontWeight: 600,
-                          }}
-                        >
-                          {user.status}
-                        </span>
-                      }
+                      value={<StatusBadge status={user.status} />}
                     />
                   }
                   right={<InfoCell label="Total Sessions" value={user.totalSessions} />}
