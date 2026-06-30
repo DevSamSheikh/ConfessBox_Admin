@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { USER_PAGE_SIZE, USERS } from '@/components/dashboard/user-management/constants/user-management.constants';
+import { USER_PAGE_SIZE, USER_PAGE_SIZE_OPTIONS, USERS } from '@/components/dashboard/user-management/constants/user-management.constants';
 import type {
   SortDirection,
   SortField,
@@ -21,6 +21,7 @@ export const useUserManagement = () => {
   const [sortDirection, setSortDirection] = React.useState<SortDirection>('desc');
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(USER_PAGE_SIZE);
   const [activeUser, setActiveUser] = React.useState<UserRecord | null>(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -51,11 +52,11 @@ export const useUserManagement = () => {
     return list;
   }, [filteredUsers, sortField, sortDirection]);
 
-  const totalPages = Math.max(1, Math.ceil(sortedUsers.length / USER_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(sortedUsers.length / pageSize));
   const pagedUsers = React.useMemo(() => {
-    const start = (currentPage - 1) * USER_PAGE_SIZE;
-    return sortedUsers.slice(start, start + USER_PAGE_SIZE);
-  }, [sortedUsers, currentPage]);
+    const start = (currentPage - 1) * pageSize;
+    return sortedUsers.slice(start, start + pageSize);
+  }, [sortedUsers, currentPage, pageSize]);
 
   React.useEffect(() => {
     if (currentPage > totalPages) {
@@ -118,6 +119,11 @@ export const useUserManagement = () => {
     setSelectedIds(new Set());
   };
 
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+  };
+
   return {
     users,
     search,
@@ -134,6 +140,8 @@ export const useUserManagement = () => {
     selectedIds,
     currentPage,
     setCurrentPage,
+    pageSize,
+    handlePageSizeChange,
     activeUser,
     setActiveUser,
     drawerOpen,

@@ -1,6 +1,6 @@
 import { ArrowDownUp, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import * as React from 'react';
-import { ROLE_CLASS, STATUS_CLASS, USER_PAGE_SIZE, USER_TABLE_CHECKBOX_CLASS } from '@/components/dashboard/user-management/constants/user-management.constants';
+import { ROLE_CLASS, STATUS_CLASS, USER_PAGE_SIZE_OPTIONS, USER_TABLE_CHECKBOX_CLASS } from '@/components/dashboard/user-management/constants/user-management.constants';
 import type { SortDirection, SortField, UserRecord, UserRole, UserStatus } from '@/components/dashboard/user-management/types/user-management.types';
 import { getInitials } from '@/components/dashboard/user-management/utils/user-management.utils';
 import { Avatar, AvatarFallback } from '@/components/shared/ui/avatar';
@@ -65,6 +65,8 @@ type UserManagementTableProps = {
   currentPage: number;
   totalPages: number;
   totalUsersCount: number;
+  pageSize: number;
+  onPageSizeChange: (newPageSize: number) => void;
   onPageChange: (nextPage: number) => void;
 };
 
@@ -84,6 +86,8 @@ export const UserManagementTable = ({
   currentPage,
   totalPages,
   totalUsersCount,
+  pageSize,
+  onPageSizeChange,
   onPageChange,
 }: UserManagementTableProps) => {
   const [bulkStatus, setBulkStatus] = React.useState<UserStatus>('Active');
@@ -223,30 +227,50 @@ export const UserManagementTable = ({
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-[var(--db-text-secondary)]">
-          Showing {(currentPage - 1) * USER_PAGE_SIZE + 1} to {Math.min(currentPage * USER_PAGE_SIZE, totalUsersCount)} of {totalUsersCount} users
+          Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalUsersCount)} of {totalUsersCount} users
         </p>
-        <div className="flex items-center gap-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]"
-            disabled={currentPage <= 1}
-            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[var(--db-text-secondary)]">Rows per page</span>
+          <Select
+            value={String(pageSize)}
+            onValueChange={(v) => {
+              onPageSizeChange(Number(v));
+            }}
           >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="rounded-md border border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)] px-2 py-1 text-xs text-[var(--db-text-secondary)]">
-            {currentPage}
-          </span>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]"
-            disabled={currentPage >= totalPages}
-            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+            <SelectTrigger className="h-8 w-[88px]" aria-label="Rows per page">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {USER_PAGE_SIZE_OPTIONS.map((n) => (
+                <SelectItem key={n} value={String(n)}>
+                  {n}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex items-center gap-1">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]"
+              disabled={currentPage <= 1}
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="rounded-md border border-[var(--db-border-subtle)] bg-[var(--db-card-elevated)] px-2 py-1 text-xs text-[var(--db-text-secondary)]">
+              {currentPage}
+            </span>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-[var(--db-text-secondary)] hover:bg-[var(--db-overlay-soft)]"
+              disabled={currentPage >= totalPages}
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </section>

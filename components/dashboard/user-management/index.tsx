@@ -31,6 +31,8 @@ export const UserManagementPage = () => {
     selectedIds,
     currentPage,
     setCurrentPage,
+    pageSize,
+    handlePageSizeChange,
     activeUser,
     setActiveUser,
     drawerOpen,
@@ -98,6 +100,8 @@ export const UserManagementPage = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           totalUsersCount={sortedUsers.length}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
           onPageChange={setCurrentPage}
         />
       </div>

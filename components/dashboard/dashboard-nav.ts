@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
-  BarChart3,
   CalendarDays,
+  FileText,
   Gauge,
   Inbox,
   Instagram,
@@ -18,7 +18,7 @@ export type DashboardNavItem = {
   key:
     | 'dashboard'
     | 'user-management'
-    | 'analytics'
+    | 'post-management'
     | 'schedules'
     | 'inbox'
     | 'reporting'
@@ -41,7 +41,12 @@ export const dashboardPrimaryNav: DashboardNavItem[] = [
     icon: UserCog,
     href: '/dashboard/user-management',
   },
-  { key: 'analytics', label: 'Analytics', icon: BarChart3, href: '/dashboard' },
+  {
+    key: 'post-management',
+    label: 'Post Management',
+    icon: FileText,
+    href: '/dashboard/post-management',
+  },
   {
     key: 'schedules',
     label: 'Schedules',
