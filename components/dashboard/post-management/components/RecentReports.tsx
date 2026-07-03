@@ -1,5 +1,3 @@
-  'use client';
-
 import { ChevronLeft, ChevronRight, MoreHorizontal, Eye, Check, Trash2, AlertTriangle, CheckSquare, Square } from 'lucide-react';
 import * as React from 'react';
 import { REPORT_RECORDS, PRIORITY_CLASS, REPORT_STATUS_CLASS } from '../constants/post-management.constants';
@@ -23,6 +21,7 @@ import {
 } from '@/components/shared/ui/table';
 import { Badge } from '@/components/shared/ui/badge';
 import { cn } from '@/lib/utils';
+import { ReportDetailsDrawer } from './ReportDetailsDrawer';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
@@ -36,6 +35,8 @@ export const RecentReports = ({ onOpenDrawer }: RecentReportsProps) => {
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [selectedBulkAction, setSelectedBulkAction] = React.useState<string>('');
   const [reports, setReports] = React.useState<ReportRecord[]>(REPORT_RECORDS);
+  const [selectedReport, setSelectedReport] = React.useState<ReportRecord | null>(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const total = reports.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -70,6 +71,11 @@ export const RecentReports = ({ onOpenDrawer }: RecentReportsProps) => {
       newSelected.add(id);
     }
     setSelectedIds(newSelected);
+  };
+
+  const handleRowClick = (row: ReportRecord) => {
+    setSelectedReport(row);
+    setDrawerOpen(true);
   };
 
   const handleBulkAction = () => {
@@ -203,7 +209,7 @@ export const RecentReports = ({ onOpenDrawer }: RecentReportsProps) => {
                 <TableRow
                   key={row.id}
                   className="cursor-pointer border-[var(--db-border-subtle)] hover:bg-[var(--db-overlay-soft)]"
-                  onClick={() => onOpenDrawer?.()}
+                  onClick={() => handleRowClick(row)}
                 >
                   <TableCell className="w-[40px]">
                     <button
@@ -352,6 +358,11 @@ export const RecentReports = ({ onOpenDrawer }: RecentReportsProps) => {
           </nav>
         </CardFooter>
       )}
+      <ReportDetailsDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        report={selectedReport}
+      />
     </Card>
   );
 };

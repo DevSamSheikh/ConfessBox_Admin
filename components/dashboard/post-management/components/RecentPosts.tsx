@@ -23,6 +23,7 @@ import {
 } from '@/components/shared/ui/table';
 import { Badge } from '@/components/shared/ui/badge';
 import { cn } from '@/lib/utils';
+import { PostManagementDrawer } from './PostManagementDrawer';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 
@@ -54,6 +55,8 @@ export const RecentPosts = ({ onOpenDrawer }: RecentPostsProps) => {
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [selectedBulkAction, setSelectedBulkAction] = React.useState<string>('');
   const [posts, setPosts] = React.useState<PostRecord[]>(POST_RECORDS);
+  const [selectedPost, setSelectedPost] = React.useState<PostRecord | null>(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const total = posts.length;
   const scannedCount = posts.filter((post) => post.scanned).length;
@@ -116,6 +119,11 @@ export const RecentPosts = ({ onOpenDrawer }: RecentPostsProps) => {
     
     setSelectedIds(new Set());
     setSelectedBulkAction('');
+  };
+
+  const handleRowClick = (post: PostRecord) => {
+    setSelectedPost(post);
+    setDrawerOpen(true);
   };
 
   return (
@@ -233,7 +241,7 @@ export const RecentPosts = ({ onOpenDrawer }: RecentPostsProps) => {
                 <TableRow
                   key={row.id}
                   className="cursor-pointer border-[var(--db-border-subtle)] hover:bg-[var(--db-overlay-soft)]"
-                  onClick={() => onOpenDrawer?.()}
+                  onClick={() => handleRowClick(row)}
                 >
                   <TableCell className="w-[40px]">
                     <button
@@ -395,6 +403,11 @@ export const RecentPosts = ({ onOpenDrawer }: RecentPostsProps) => {
           </nav>
         </CardFooter>
       )}
+      <PostManagementDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        post={selectedPost}
+      />
     </Card>
   );
 };
